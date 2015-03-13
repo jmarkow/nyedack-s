@@ -161,6 +161,7 @@ start_time=([datestr(now,'HHMMSS')]);
 session=daq.createSession(in_device_type);
 addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
 session.Rate=fs;
+session.IsContinuous=1;
 
 for i=1:length(session.Channels)
 	session.Channels(i).Name=channel_labels{i};
