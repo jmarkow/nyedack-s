@@ -14,7 +14,7 @@ nchannels=length(obj.Channels);
 %%% preview code
 
 data.voltage=event.Data;
-data.time=event.TimeStemps;
+data.time=event.TimeStamps;
 
 datafile_name=[ file_basename '_' datestr(now,file_format) '.mat' ];
 
