@@ -24,9 +24,9 @@ data.names={};
 data.parameters.sensor_range={};
 
 for i=1:nchannels
-	data.labels{i}=obj.Channel(i).ID;
-	data.names{i}=obj.Channel(i).Name;
-	data.parameters.sensor_range{i}=obj.Channel(i).Range;
+	data.labels{i}=obj.Channels(i).ID;
+	data.names{i}=obj.Channels(i).Name;
+	data.parameters.sensor_range{i}=obj.Channels(i).Range;
 end
 
 if ~isempty(folder_format)	
