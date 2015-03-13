@@ -79,7 +79,7 @@ if nargin<1 | isempty(INCHANNELS), INCHANNELS=0; end
 nparams=length(varargin);
 
 restarts=0;
-base_dir='nyedack'; % base directory to save
+base_dir='nyedack_data'; % base directory to save
 fs=40e3; % sampling frequency (in Hz)
 note=''; % note to save in log file
 save_freq=60; % save frequency (in s)
@@ -88,7 +88,7 @@ in_device='dev2'; % location of input device
 in_device_type='ni'; % input device type
 out_device='dev2'; % location of output device
 out_device_type='ni'; % output device type
-folder_format='yyyy-mm-dd'; % date string format for folders
+folder_format=''; % date string format for folders
 file_format='yymmdd_HHMMSS'; % date string format for files
 out_dir='mat'; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
@@ -179,6 +179,10 @@ end
 
 save_dir=fullfile(base_dir,datestr(now,folder_format),out_dir);
 
+if ~exist(base_dir,'dir')
+	mkdir(base_dir);
+end
+
 logfile_name=sprintf('%s_%s',fullfile(base_dir,'log'),datestr(now,30));
 logfile=fopen([ logfile_name '.txt' ],'w');
 fprintf(logfile,'Run started at %s\n\n',datestr(now));
@@ -220,8 +224,8 @@ start_button=uicontrol(button_figure,'style','pushbutton',...
 	'Value',0,'Position',[.5 .5 .3 .3],...
 	'Enable','off');
 
-set(stop_button,'call',{@nyedack-s_stop_routine,logfile,objects,status_text,start_button,stop_button});
-set(start_button,'call',{@nyedack-s_start_routine,logfile,objects,status_text,start_button,stop_button});
+set(stop_button,'call',{@nyedack_s_stop_routine,logfile,objects,status_text,start_button,stop_button});
+set(start_button,'call',{@nyedack_s_start_routine,logfile,objects,status_text,start_button,stop_button});
 
 % refresh rate of scope determined by TimerPeriod
 
@@ -232,10 +236,10 @@ quit_button=uicontrol(button_figure,'style','pushbutton',...
 	'units','normalized',...
 	'FontSize',15,...
 	'Value',0,'Position',[.1 .05 .7 .4],...
-	'call',{@nyedack-s_early_quit,button_figure});
+	'call',{@nyedack_s_early_quit,button_figure});
 
 set(button_figure,'Visible','on');
-lh{1}=addlistener(session,'DataAvailable',{@nyedack-s_dump_data,save_dir,folder_format,out_dir,file_basename,file_format,logfile});
+lh{1}=addlistener(session,'DataAvailable',{@nyedack_s_dump_data,save_dir,folder_format,out_dir,file_basename,file_format,logfile});
 session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
 startBackground(session);
 
