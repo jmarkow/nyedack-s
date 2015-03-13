@@ -1,4 +1,4 @@
-function cleanup_routine(obj,event,save_directory,logfile,objects,button_figure,listeners)
+function cleanup_routine(obj,event,save_directory,logfile,objects,listeners,button_figure)
 
 disp('Cleaning up and quitting...');
 
@@ -8,7 +8,7 @@ warning('on','daq:general:nosave');
 
 for i=1:length(objects)
 	stop(objects{i});
-	disp(['Object ' num2str(i) ' isrunning:  ' num2str(objects{i}.IsRunning)]);
+	fprintf('Object %i (%s) isrunning %i\n',i,objects{i}.Vendor.ID,objects{i}.IsRunning);	
 end
 
 disp('Run complete!');
