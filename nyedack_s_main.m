@@ -94,6 +94,7 @@ out_dir='mat'; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
 channel_skew='equisample'; % time between samples
 file_basename='data'; % basename for save files
+pxi_fix=0;
 
 if mod(nparams,2)>0
 	error('Parameters must be specified as parameter/value pairs!');
@@ -157,6 +158,12 @@ end
 start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
+
+daq.reset;
+
+if pxi_fix
+	daq.HardwareInfo.getInstance('DisableReferenceClockSynchronization',true);
+end
 
 session=daq.createSession(in_device_type);
 addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
@@ -243,6 +250,7 @@ set(button_figure,'Visible','on');
 lh{1}=addlistener(session,'DataAvailable',...
 	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile));
 session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
+
 startBackground(session);
 
 set(status_text,'string','Status:  running','ForegroundColor','g');
