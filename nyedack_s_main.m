@@ -158,7 +158,7 @@ start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
 
-session=daq.CreateSession(in_device_type);
+session=daq.createSession(in_device_type);
 addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
 session.Rate=fs;
 
