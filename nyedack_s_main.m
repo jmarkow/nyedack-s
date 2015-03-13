@@ -239,7 +239,7 @@ set(start_button,'call',{@nyedack_s_start_routine,logfile,objects,status_text,st
 
 % refresh rate of scope determined by TimerPeriod
 
-%cleanup_object=onCleanup(@()nyedack_cleanup_routine([],[],save_dir,logfile,objects,button_figure,preview_figure));
+cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,button_figure));
 
 quit_button=uicontrol(button_figure,'style','pushbutton',...
 	'String','Quit Acquisition',...
