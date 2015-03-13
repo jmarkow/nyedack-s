@@ -8,7 +8,7 @@ warning('on','daq:general:nosave');
 
 for i=1:length(objects)
 	stop(objects{i});
-	fprintf('Object %i (%s) isrunning %i\n',i,objects{i}.Vendor.ID,objects{i}.IsRunning);	
+	fprintf('Object %i (%s) isrunning %i\n',i,objects{i}.Vendor.ID,objects{i}.IsRunning);
 end
 
 disp('Run complete!');
