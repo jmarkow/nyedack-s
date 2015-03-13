@@ -220,8 +220,8 @@ start_button=uicontrol(button_figure,'style','pushbutton',...
 	'Value',0,'Position',[.5 .5 .3 .3],...
 	'Enable','off');
 
-set(stop_button,'call',{@nyedack_stop_routine,logfile,objects,status_text,start_button,stop_button});
-set(start_button,'call',{@nyedack_start_routine,logfile,objects,status_text,start_button,stop_button});
+set(stop_button,'call',{@nyedack-s_stop_routine,logfile,objects,status_text,start_button,stop_button});
+set(start_button,'call',{@nyedack-s_start_routine,logfile,objects,status_text,start_button,stop_button});
 
 % refresh rate of scope determined by TimerPeriod
 
@@ -237,9 +237,7 @@ quit_button=uicontrol(button_figure,'style','pushbutton',...
 set(button_figure,'Visible','on');
 lh{1}=addlistener(session,'DataAvailable',{@nyedack-s_dump_data,save_dir,folder_format,out_dir,file_basename,file_format,logfile});
 session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
-
 startBackground(session);
-
 
 set(status_text,'string','Status:  running','ForegroundColor','g');
 
