@@ -11,7 +11,7 @@ end
 
 counter=0;
 for i=1:length(objects)
-	if strcmpi(get(objects{i},'Running'),'On')
+	if objects{i}.IsRunning
 		counter=counter+1;
 	end
 end

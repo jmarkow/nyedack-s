@@ -267,7 +267,7 @@ end
 stop(session);
 
 for i=1:length(lh)
-	delete(lh);
+	delete(lh{i});
 end
 
 % if everything worked, copy the finish time and wrap up
