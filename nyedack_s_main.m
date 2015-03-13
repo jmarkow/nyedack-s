@@ -90,7 +90,7 @@ out_device='dev2'; % location of output device
 out_device_type='ni'; % output device type
 folder_format=''; % date string format for folders
 file_format='yymmdd_HHMMSS'; % date string format for files
-out_dir='mat'; % save files to this sub directory
+out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
 channel_skew='equisample'; % time between samples
 file_basename='data'; % basename for save files
@@ -208,12 +208,14 @@ fprintf(logfile,']\n\n');
 
 objects{1}=session;
 
+% TODO: add outputs here
+
 % record until we reach the stopping time or the quit button is pressed
 % rudimentary set of buttons to pause, resume or quit
 % perhaps add a button for manual triggering of the output for testing
 
 button_figure=figure('Visible','off','Name',['Push button v.001a'],...
-	'Position',[200,200,300,250],'NumberTitle','off',...
+	'Position',[200,500,300,250],'NumberTitle','off',...
 	'menubar','none','resize','off');
 status_text=uicontrol(button_figure,'style','text',...
 	'String','Status:  ',...
