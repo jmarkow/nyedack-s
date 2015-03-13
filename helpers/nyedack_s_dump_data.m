@@ -8,7 +8,7 @@ function dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_f
 
 % do we want to preview?
 
-actualrate=obj.SampleRate;
+actualrate=obj.Rate;
 nchannels=length(obj.Channels);
 
 %%% preview code
