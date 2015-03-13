@@ -259,7 +259,7 @@ set(status_text,'string','Status:  running','ForegroundColor','g');
 
 % pause for a millisecond, consider storing status in userdata
 
-while now<datenum(rec_datevec)
+while 1>0
 	if ~ishandle(button_figure), break; end
 	pause(1e-3);
 end
