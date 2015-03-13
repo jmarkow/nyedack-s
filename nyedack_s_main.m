@@ -246,7 +246,22 @@ set(status_text,'string','Status:  running','ForegroundColor','g');
 
 while 1>0
 	if ~ishandle(button_figure), break; end
-	pause(1e-3);
+
+	flag=1;
+	for i=1:length(objects)
+		if ~objects{i}.IsRunning
+			flag=0;
+			break;
+		end
+	end
+	
+	if flag
+		set(status_text,'string','Status:  running','ForegroundColor','g');
+	else
+		set(status_text,'string','Status:  stopped','ForegroundColor','r');
+	end
+
+	pause(.1);
 end
 
 % if everything worked, copy the finish time and wrap up
