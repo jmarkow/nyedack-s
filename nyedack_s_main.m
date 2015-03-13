@@ -1,5 +1,5 @@
-function nyedack_main(INCHANNELS,OUTPUT,varargin)
-% CLI interface for recording data through the MATLAB legacy interface
+function nyedack_s_main(INCHANNELS,OUTPUT,varargin)
+% CLI interface for recording data through the MATLAB session interface 
 %
 %	nyedack_main(INCHANNELS,OUTPUT,varargin)
 %
@@ -22,9 +22,6 @@ function nyedack_main(INCHANNELS,OUTPUT,varargin)
 %
 %		save_freq
 %		frequency for dumping data to disk from memory (in s, default: 60)
-%
-%		stop_time
-%		time to stop recording (vector in [d h m s] format, default: [100 0 0 0], will record for 100 days)
 %
 %		in_device
 %		input device location (default: 'dev2')
@@ -49,23 +46,14 @@ function nyedack_main(INCHANNELS,OUTPUT,varargin)
 %		out_dir
 %		data storage sub directory (default: 'mat')
 %
-%		hannel_labels
+%		channel_labels
 %		labels for INCHANNELS (cell array, default: empty)
-%
-%		preview_enable
-%		enable preview of data (default: 0)
-%
-%		preview_dcoffset
-%		remove DC component of data for preview (default: 1)
-%
-%		polling_rate
-%		how often to check for data samples (in s, default: .05)
 %
 %	Example:
 %	
 %	Record from 'nidaq' 'dev2' channels [0:5], and preview data
 %
-%	>>nyedack_main([0:5],[],'in_device_type','nidaq','in_device','dev2','preview_enable',1);
+%	>>nyedack_s_main([0:5],[],'in_device_type','nidaq','in_device','dev2');
 %	
 %
 
