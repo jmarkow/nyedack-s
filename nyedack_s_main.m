@@ -132,6 +132,8 @@ for i=1:2:nparams
 			file_format=varargin{i+1};
 		case 'channel_skew'
 			channel_skew=varargin{i+1};
+		case 'pxi_fix'
+			pxi_fix=varargin{i+1];
 		otherwise
 	end
 end
