@@ -78,12 +78,10 @@ if nargin<1 | isempty(INCHANNELS), INCHANNELS=0; end
 
 nparams=length(varargin);
 
-restarts=0;
 base_dir='nyedack_data'; % base directory to save
 fs=40e3; % sampling frequency (in Hz)
 note=''; % note to save in log file
 save_freq=60; % save frequency (in s)
-stop_time=[100 0 0 0 ]; % when to stop recording (d h m s)
 in_device='dev2'; % location of input device
 in_device_type='ni'; % input device type
 out_device='dev2'; % location of output device
@@ -92,7 +90,6 @@ folder_format=''; % date string format for folders
 file_format='yymmdd_HHMMSS'; % date string format for files
 out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
-channel_skew='equisample'; % time between samples
 file_basename='data'; % basename for save files
 pxi_fix=0;
 
@@ -104,8 +101,6 @@ for i=1:2:nparams
 	switch lower(varargin{i})
 		case 'note'
 			note=varargin{i+1};
-		case 'restarts'
-			restarts=varargin{i+1};
 		case 'base_dir'
 			base_dir=varargin{i+1};
 		case 'fs'
@@ -130,8 +125,6 @@ for i=1:2:nparams
 			file_basename=varargin{i+1};
 		case 'file_format'
 			file_format=varargin{i+1};
-		case 'channel_skew'
-			channel_skew=varargin{i+1};
 		case 'pxi_fix'
 			pxi_fix=varargin{i+1};
 		otherwise
