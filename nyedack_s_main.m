@@ -239,7 +239,6 @@ set(start_button,'call',{@nyedack_s_start_routine,logfile,objects,status_text,st
 
 % refresh rate of scope determined by TimerPeriod
 
-cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,button_figure));
 
 quit_button=uicontrol(button_figure,'style','pushbutton',...
 	'String','Quit Acquisition',...
@@ -248,10 +247,13 @@ quit_button=uicontrol(button_figure,'style','pushbutton',...
 	'Value',0,'Position',[.1 .05 .7 .4],...
 	'call',{@nyedack_s_early_quit,button_figure});
 
+warning('off','daq:general:nosave');
+
 set(button_figure,'Visible','on');
-lh{1}=addlistener(session,'DataAvailable',...
+listeners{1}=addlistener(session,'DataAvailable',...
 	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile));
 session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
+cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,listeners,button_figure));
 
 startBackground(session);
 
@@ -262,12 +264,6 @@ set(status_text,'string','Status:  running','ForegroundColor','g');
 while 1>0
 	if ~ishandle(button_figure), break; end
 	pause(1e-3);
-end
-
-stop(session);
-
-for i=1:length(lh)
-	delete(lh{i});
 end
 
 % if everything worked, copy the finish time and wrap up
