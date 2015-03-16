@@ -153,10 +153,22 @@ addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
 session.Rate=fs;
 session.IsContinuous=1;
 
+
 for i=1:length(session.Channels)
+
+	param_names=fieldnames(session.Channels(i));
+
 	session.Channels(i).Name=channel_labels{i};
 	session.Channels(i).Coupling='DC';
-	session.Channels(i).TerminalConfig='SingleEnded';
+
+	if any(strcmp(param_names,'TerminalConfig'))
+		session.Channels(i).TerminalConfig='SingleEnded';
+	elseif any(strcmp(param_names,'InputType'))
+		session.Channels(i).InputType='SingleEnded';
+	else
+		error('Could not set NiDaq input type');
+	end
+
 end
 
 % check to see if the actual sampling rate meets our specs, otherwise bail
