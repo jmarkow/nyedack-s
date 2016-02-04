@@ -52,7 +52,7 @@ warning('off','daq:general:nosave');
 % kinect initialization
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-pause(3); %allow time for both streams to start
+pause(5); %allow time for both streams to start
 
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
@@ -114,6 +114,7 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 
 % aggregate oncleanup
 
+i=1;
 while i<nframes
 
 	if ~ishandle(button_figure.nidaq) | ~ishandle(button_figure.kinect)
@@ -162,7 +163,5 @@ while i<nframes
   else
     fprintf(csv_file,'%g, %g\n');
   end
-
-	i=i+nframes_per_trig;
 
 end
