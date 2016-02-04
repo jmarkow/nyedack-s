@@ -109,8 +109,8 @@ set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','
 set(components.kinect.status_text,'string','Status:  running','ForegroundColor','g');
 
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
-  SAVE_DIR,LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,...
-	KINECT_OBJECTS,[parameters.depth_fig csv_file],preview_fig));
+  SAVE_DIR,LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
+	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
 
 % aggregate oncleanup
 
