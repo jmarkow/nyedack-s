@@ -15,7 +15,7 @@ disp('Run complete!');
 
 figs=fieldnames(button_figure);
 for i=1:length(figs)
-	if ishandle(button_figure.(figs{i}))
+	if isfield(button_figure,figs{i}) & ishandle(button_figure.(figs{i}))
 		delete(button_figure.(figs{i}));
 	end
 end
