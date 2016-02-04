@@ -1,4 +1,4 @@
-function nyedack_s_loop_nidaq(SESSION,OBJECTS,LISTENERS,LOGFILE,SAVE_DIR)
+function nyedack_s_loop_nidaq(SESSION,OBJECTS,LISTENERS,LOGFILE)
 %
 %
 %
@@ -22,7 +22,7 @@ set(components.quit_button,'call',...
 warning('off','daq:general:nosave');
 
 set(button_figure,'Visible','on');
-cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],SAVE_DIR,LOGFILE,OBJECTS,LISTENERS,button_figure));
+cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],LOGFILE,OBJECTS,LISTENERS,button_figure));
 
 % options for separate loops (just NiDaq, NiDaq+Kinect, etc. )
 

@@ -1,4 +1,4 @@
-function cleanup_routine(obj,event,save_directory,logfile,objects,listeners,button_figure)
+function nyedack_s_cleanup_routine(obj,event,logfile,objects,listeners,button_figure)
 
 disp('Cleaning up and quitting...');
 

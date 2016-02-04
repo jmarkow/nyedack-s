@@ -185,7 +185,7 @@ switch lower(loop)
 
 	case 'nidaq'
 
-		nyedack_s_loop_nidaq(objects,listeners,logfile,save_dir);
+		nyedack_s_loop_nidaq(objects,listeners,logfile);
 
 	case 'nidaq+kinect'
 
@@ -199,7 +199,7 @@ switch lower(loop)
 
     kinect_objects=kinect_v1_logging(objects,varargin{:});
 
-		nyedack_s_loop_nidaq_kinect(objects,listeners,logfile,save_dir,...
+		nyedack_s_loop_nidaq_kinect(objects,listeners,logfile,...
 			kinect_objects,varargin{:})
 
 	otherwise
