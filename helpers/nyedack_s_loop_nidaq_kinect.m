@@ -4,6 +4,31 @@ function nyedack_s_loop_nidaq_kinect(SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFI
 %
 %
 
+preview_mode=1;
+reference_tic=[];
+downsample_fact=2;
+frame_skip=1;
+
+nparams=length(varargin);
+
+if mod(nparams,2)>0
+	error('Parameters must be specified as parameter/value pairs!');
+end
+
+for i=1:2:nparams
+  switch lower(varargin{i})
+    case 'preview_mode'
+      preview_mode=varargin{i+1};
+    case 'reference_tic'
+      reference_tic=varargin{i+1};
+    case 'downsample_fact'
+      downsample_fact=2;
+    case 'frame_skip'
+      frame_skip=1;
+    otherwise
+	end
+end
+
 % nidaq initialization
 
 [button_figure.nidaq,components.nidaq]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
@@ -88,7 +113,6 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 	KINECT_OBJECTS,[parameters.depth_fig csv_file],preview_fig));
 
 % aggregate oncleanup
-i=1;
 
 while i<nframes
 
@@ -97,8 +121,8 @@ while i<nframes
 	end
 
 	nidaq_flag=1;
-	for j=1:length(NIDAQ_OBJECTS)
-		if ~NIDAQ_OBJECTS{j}.IsRunning
+	for i=1:length(NIDAQ_OBJECTS)
+		if ~NIDAQ_OBJECTS{i}.IsRunning
 			nidaq_flag=0;
 			break;
 		end
