@@ -52,7 +52,7 @@ warning('off','daq:general:nosave');
 % kinect initialization
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-pause(5); %allow time for both streams to start
+pause(3); %allow time for both streams to start
 
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
