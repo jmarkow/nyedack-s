@@ -137,8 +137,6 @@ while i<nframes
 
 	% Trigger both color and depth sources.
 
-	KINECT_OBJECTS.color_vid.IsRunning
-
 	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
   % Get the acquired frames and metadata.
