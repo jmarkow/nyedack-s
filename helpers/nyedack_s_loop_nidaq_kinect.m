@@ -135,11 +135,11 @@ while i<nframes
 	end
 
 	% Trigger both color and depth sources.
-  trigger([OBJECTS.color_vid OBJECTS.depth_vid]);
+  trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
   % Get the acquired frames and metadata.
-  [img_color, ts.color] = getdata(OBJECTS.color_vid);
-  [img_depth, ts.depth] = getdata(OBJECTS.depth_vid);
+  [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
+  [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
   if preview_mode==2
     if mod(i,frame_skip) == 0
