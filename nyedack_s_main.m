@@ -80,6 +80,7 @@ out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
 file_basename='data'; % basename for save files
 pxi_fix=0;
+loop='nidaq';
 
 if mod(nparams,2)>0
 	error('Parameters must be specified as parameter/value pairs!');
@@ -142,43 +143,12 @@ start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
 
-daq.reset;
-
-if pxi_fix
-	daq.HardwareInfo.getInstance('DisableReferenceClockSynchronization',true);
-end
-
-% TODO: break out setup into another function
-% TODO: support for alternative data sources
-
-session=daq.createSession(in_device_type);
-addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
-session.Rate=fs;
-session.IsContinuous=1;
-
-for i=1:length(session.Channels)
-
-	param_names=fieldnames(session.Channels(i));
-
-	session.Channels(i).Name=channel_labels{i};
-	session.Channels(i).Coupling='DC';
-
-	if any(strcmp(param_names,'TerminalConfig'))
-		session.Channels(i).TerminalConfig='SingleEnded';
-	elseif any(strcmp(param_names,'InputType'))
-		session.Channels(i).InputType='SingleEnded';
-	else
-		error('Could not set NiDaq input type');
-	end
-
-end
-
-% check to see if the actual sampling rate meets our specs, otherwise bail
-
-actualrate=session.Rate;
-if actualrate ~= fs
-	error(['Actual sampling rate (' num2str(actualrate) ') not equal to target (' num2str(fs) ')' ]);
-end
+session=nyedack_s_init_input(INCHANNELS,...
+	'pxi_fix',pxi_fix,...
+	'in_device_type',in_device_type,...
+	'in_device',in_device,...
+	'fs',fs,...
+	'channel_labels',channel_labels)
 
 % set the parameters of the analog input object
 
@@ -202,6 +172,8 @@ end
 fprintf(logfile,']\n\n');
 
 objects{1}=session;
+listeners{1}=addlistener(session,'DataAvailable',...
+	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile));
 
 % TODO: add outputs here
 
@@ -210,7 +182,6 @@ objects{1}=session;
 % perhaps add a button for manual triggering of the output for testing
 
 % TODO: break this out to another function
-
 
 [button_figure,components]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
 
@@ -229,20 +200,31 @@ set(components.quit_button,'call',...
 warning('off','daq:general:nosave');
 
 set(button_figure,'Visible','on');
-listeners{1}=addlistener(session,'DataAvailable',...
-	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile));
-session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,listeners,button_figure));
 
 % options for separate loops (just NiDaq, NiDaq+Kinect, etc. )
 
 startBackground(session);
-
 set(components.status_text,'string','Status:  running','ForegroundColor','g');
 
 % pause for a millisecond, consider storing status in userdata
 
 % separate loops for nyedack or nyedack+kinect
+
+strcmp lower(loop)
+
+	case 'nidaq'
+
+		nyedack_s_loop_nidaq(button_figure,components,objects,listeners,logfile);
+
+	case 'nidaq+kinect'
+
+		nyedack_s_loop_nidaq_kinect()
+
+	otherwise
+		error('Did not understand loop type');
+
+end
 
 while 1>0
 
