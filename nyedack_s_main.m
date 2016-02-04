@@ -181,7 +181,7 @@ listeners{1}=addlistener(session,'DataAvailable',...
 % rudimentary set of buttons to pause, resume or quit
 % perhaps add a button for manual triggering of the output for testing
 
-strcmp lower(loop)
+switch lower(loop)
 
 	case 'nidaq'
 
