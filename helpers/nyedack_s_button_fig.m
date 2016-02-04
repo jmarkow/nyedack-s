@@ -1,6 +1,6 @@
 function [BUTTON_FIG,COMPONENTS]=nyedack_s_main(varargin)
 
-fig_name='Push button v.001a'
+fig_name='Push button v.001a';
 
 nparams=length(varargin);
 

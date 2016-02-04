@@ -194,6 +194,7 @@ strcmp lower(loop)
 		nyedack_s_loop_nidaq_kinect()
 
 	otherwise
+		
 		error('Did not understand loop type');
 
 end
