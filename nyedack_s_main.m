@@ -1,5 +1,5 @@
 function nyedack_s_main(INCHANNELS,OUTPUT,varargin)
-% CLI interface for recording data through the MATLAB session interface 
+% CLI interface for recording data through the MATLAB session interface
 %
 %	nyedack_main(INCHANNELS,OUTPUT,varargin)
 %
@@ -8,7 +8,7 @@ function nyedack_s_main(INCHANNELS,OUTPUT,varargin)
 %
 %	OUTPUT
 %	structure specifying how to deliver output (leave empty for no output)
-%	
+%
 %	the following may be specified as parameter/value pairs:
 %
 %		fs
@@ -50,11 +50,11 @@ function nyedack_s_main(INCHANNELS,OUTPUT,varargin)
 %		labels for INCHANNELS (cell array, default: empty)
 %
 %	Example:
-%	
+%
 %	Record from 'nidaq' 'dev2' channels [0:5], and preview data
 %
 %	>>nyedack_s_main([0:5],[],'in_device_type','nidaq','in_device','dev2');
-%	
+%
 %
 
 % collect the input variables and use defaults if necessary
@@ -148,11 +148,13 @@ if pxi_fix
 	daq.HardwareInfo.getInstance('DisableReferenceClockSynchronization',true);
 end
 
+% TODO: break out setup into another function
+% TODO: support for alternative data sources
+
 session=daq.createSession(in_device_type);
 addAnalogInputChannel(session,in_device,INCHANNELS,'voltage');
 session.Rate=fs;
 session.IsContinuous=1;
-
 
 for i=1:length(session.Channels)
 
@@ -207,40 +209,22 @@ objects{1}=session;
 % rudimentary set of buttons to pause, resume or quit
 % perhaps add a button for manual triggering of the output for testing
 
-button_figure=figure('Visible','off','Name',['Push button v.001a'],...
-	'Position',[200,500,300,250],'NumberTitle','off',...
-	'menubar','none','resize','off');
-status_text=uicontrol(button_figure,'style','text',...
-	'String','Status:  ',...
-	'FontSize',15,...
-	'ForegroundColor','k',...
-	'units','normalized',...
-	'FontWeight','bold',...
-	'Position',[.1 .875 .7 .1]);
-stop_button=uicontrol(button_figure,'style','pushbutton',...
-	'String','Pause Acquisition',...
-	'units','normalized',...
-	'FontSize',15,...
-	'Value',0,'Position',[.1 .5 .3 .3]);
-start_button=uicontrol(button_figure,'style','pushbutton',...
-	'String','Resume Acquisition',...
-	'units','normalized',...
-	'FontSize',15,...
-	'Value',0,'Position',[.5 .5 .3 .3],...
-	'Enable','off');
+% TODO: break this out to another function
 
-set(stop_button,'call',{@nyedack_s_stop_routine,logfile,objects,status_text,start_button,stop_button});
-set(start_button,'call',{@nyedack_s_start_routine,logfile,objects,status_text,start_button,stop_button});
+
+[button_figure,components]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
+
+% add figure for output as well
+
+set(components.stop_button,'call',...
+	{@nyedack_s_stop_routine,logfile,objects,components.status_text,components.start_button,components.stop_button});
+set(components.start_button,'call',...
+	{@nyedack_s_start_routine,logfile,objects,components.status_text,components.start_button,components.stop_button});
 
 % refresh rate of scope determined by TimerPeriod
 
-
-quit_button=uicontrol(button_figure,'style','pushbutton',...
-	'String','Quit Acquisition',...
-	'units','normalized',...
-	'FontSize',15,...
-	'Value',0,'Position',[.1 .05 .7 .4],...
-	'call',{@nyedack_s_early_quit,button_figure});
+set(components.quit_button,'call',...
+	{@nyedack_s_early_quit,button_figure});
 
 warning('off','daq:general:nosave');
 
@@ -250,13 +234,18 @@ listeners{1}=addlistener(session,'DataAvailable',...
 session.NotifyWhenDataAvailableExceeds=round(save_freq*actualrate);
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,listeners,button_figure));
 
+% options for separate loops (just NiDaq, NiDaq+Kinect, etc. )
+
 startBackground(session);
 
-set(status_text,'string','Status:  running','ForegroundColor','g');
+set(components.status_text,'string','Status:  running','ForegroundColor','g');
 
 % pause for a millisecond, consider storing status in userdata
 
+% separate loops for nyedack or nyedack+kinect
+
 while 1>0
+
 	if ~ishandle(button_figure), break; end
 
 	flag=1;
@@ -266,14 +255,15 @@ while 1>0
 			break;
 		end
 	end
-	
+
 	if flag
-		set(status_text,'string','Status:  running','ForegroundColor','g');
+		set(components.status_text,'string','Status:  running','ForegroundColor','g');
 	else
-		set(status_text,'string','Status:  stopped','ForegroundColor','r');
+		set(components.status_text,'string','Status:  stopped','ForegroundColor','r');
 	end
 
 	pause(.1);
+
 end
 
 % if everything worked, copy the finish time and wrap up
