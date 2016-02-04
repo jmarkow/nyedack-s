@@ -163,7 +163,7 @@ logfile=fopen([ logfile_name '.txt' ],'w');
 fprintf(logfile,'Run started at %s\n\n',datestr(now));
 fprintf(logfile,[note '\n']);
 fprintf(logfile,'User specified save frequency: %g minutes\n',save_freq/60);
-fprintf(logfile,'Sampling rate:  %g\nChannels=[',actualrate);
+fprintf(logfile,'Sampling rate:  %g\nChannels=[',fs);
 
 for i=1:length(INCHANNELS)
 	fprintf(logfile,' %g ',INCHANNELS(i));
