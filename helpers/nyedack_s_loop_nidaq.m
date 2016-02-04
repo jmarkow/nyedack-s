@@ -1,37 +1,37 @@
-function nyedack_s_loop_nidaq(SESSION,BUTTON_FIGURE,COMPONENTS,OBJECTS,LISTENERS,LOGFILE,SAVE_DIR)
+function nyedack_s_loop_nidaq(SESSION,OBJECTS,LISTENERS,LOGFILE,SAVE_DIR)
 %
 %
 %
 %
 
 
-[BUTTON_FIGURE,COMPONENTS]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
+[button_figure,components]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
 
 % add figure for output as well
 
-set(COMPONENTS.stop_button,'call',...
-	{@nyedack_s_stop_routine,LOGFILE,OBJECTS,COMPONENTS.status_text,COMPONENTS.start_button,COMPONENTS.stop_button});
-set(COMPONENTS.start_button,'call',...
-	{@nyedack_s_start_routine,LOGFILE,OBJECTS,COMPONENTS.status_text,COMPONENTS.start_button,COMPONENTS.stop_button});
+set(components.stop_button,'call',...
+	{@nyedack_s_stop_routine,LOGFILE,OBJECTS,components.status_text,components.start_button,components.stop_button});
+set(components.start_button,'call',...
+	{@nyedack_s_start_routine,LOGFILE,OBJECTS,components.status_text,components.start_button,components.stop_button});
 
 % refresh rate of scope determined by TimerPeriod
 
-set(COMPONENTS.quit_button,'call',...
-	{@nyedack_s_early_quit,BUTTON_FIGURE});
+set(components.quit_button,'call',...
+	{@nyedack_s_early_quit,button_figure});
 
 warning('off','daq:general:nosave');
 
-set(BUTTON_FIGURE,'Visible','on');
-cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],SAVE_DIR,LOGFILE,OBJECTS,LISTENERS,BUTTON_FIGURE));
+set(button_figure,'Visible','on');
+cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],SAVE_DIR,LOGFILE,OBJECTS,LISTENERS,button_figure));
 
 % options for separate loops (just NiDaq, NiDaq+Kinect, etc. )
 
 startBackground(SESSION);
-set(COMPONENTS.status_text,'string','Status:  running','ForegroundColor','g');
+set(components.status_text,'string','Status:  running','ForegroundColor','g');
 
 while 1>0
 
-	if ~ishandle(BUTTON_FIGURE), break; end
+	if ~ishandle(button_figure), break; end
 
 	flag=1;
 	for i=1:length(OBJECTS)
@@ -42,9 +42,9 @@ while 1>0
 	end
 
 	if flag
-		set(COMPONENTS.status_text,'string','Status:  running','ForegroundColor','g');
+		set(components.status_text,'string','Status:  running','ForegroundColor','g');
 	else
-		set(COMPONENTS.status_text,'string','Status:  stopped','ForegroundColor','r');
+		set(components.status_text,'string','Status:  stopped','ForegroundColor','r');
 	end
 
 	pause(.1);

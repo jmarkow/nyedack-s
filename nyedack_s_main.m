@@ -181,24 +181,29 @@ listeners{1}=addlistener(session,'DataAvailable',...
 % rudimentary set of buttons to pause, resume or quit
 % perhaps add a button for manual triggering of the output for testing
 
-% separate loops for nyedack or nyedack+kinect
-
 strcmp lower(loop)
 
 	case 'nidaq'
 
-		nyedack_s_loop_nidaq(button_figure,components,objects,listeners,logfile);
+		nyedack_s_loop_nidaq(objects,listeners,logfile,save_dir);
 
 	case 'nidaq+kinect'
 
-		nyedack_s_loop_nidaq_kinect()
+		% get the kinect ready for prime time if we're using it
+
+		[kinect_status,kinect_objects]=kinect_v1_init(varargin{:});
+
+    if kinect_status~=0
+      error('Could not initialize kinect.');
+    end
+
+    kinect_objects=kinect_v1_logging(objects,varargin{:});
+
+		nyedack_s_loop_nidaq_kinect(objects,listeners,logfile,save_dir,...
+			kinect_objects,varargin{:})
 
 	otherwise
-		
+
 		error('Did not understand loop type');
 
 end
-
-
-
-% if everything worked, copy the finish time and wrap up
