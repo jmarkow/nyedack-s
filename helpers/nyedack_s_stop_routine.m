@@ -1,4 +1,4 @@
-function stop_routine(obj,event,logfile,objects,status_text,start_button,stop_button)
+function nyedack_s_stop_routine(obj,event,logfile,objects,status_text,start_button,stop_button)
 %
 %
 %

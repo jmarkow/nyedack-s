@@ -116,6 +116,8 @@ for i=1:2:nparams
 			file_format=varargin{i+1};
 		case 'pxi_fix'
 			pxi_fix=varargin{i+1};
+        case 'loop'
+            loop=varargin{i+1};
 		otherwise
 	end
 end
@@ -185,7 +187,7 @@ switch lower(loop)
 
 	case 'nidaq'
 
-		nyedack_s_loop_nidaq(objects,listeners,logfile);
+		nyedack_s_loop_nidaq(session,objects,listeners,logfile);
 
 	case 'nidaq+kinect'
 
@@ -197,9 +199,9 @@ switch lower(loop)
       error('Could not initialize kinect.');
     end
 
-    kinect_objects=kinect_v1_logging(objects,varargin{:});
+    kinect_objects=kinect_v1_logging(kinect_objects,varargin{:});
 
-		nyedack_s_loop_nidaq_kinect(objects,listeners,logfile,...
+		nyedack_s_loop_nidaq_kinect(session,objects,listeners,logfile,...
 			kinect_objects,varargin{:})
 
 	otherwise

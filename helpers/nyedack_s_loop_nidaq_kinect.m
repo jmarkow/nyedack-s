@@ -1,4 +1,4 @@
-function nyedack_s_loop_nidaq_kinect(SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFILE,SAVE_DIR,KINECT_OBJECTS,varargin)
+function nyedack_s_loop_nidaq_kinect(SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFILE,KINECT_OBJECTS,varargin)
 %
 %
 %
@@ -88,6 +88,7 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 	KINECT_OBJECTS,[parameters.depth_fig csv_file],preview_fig));
 
 % aggregate oncleanup
+i=1;
 
 while i<nframes
 
@@ -96,8 +97,8 @@ while i<nframes
 	end
 
 	nidaq_flag=1;
-	for i=1:length(NIDAQ_OBJECTS)
-		if ~NIDAQ_OBJECTS{i}.IsRunning
+	for j=1:length(NIDAQ_OBJECTS)
+		if ~NIDAQ_OBJECTS{j}.IsRunning
 			nidaq_flag=0;
 			break;
 		end
