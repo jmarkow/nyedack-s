@@ -2,6 +2,12 @@ function [BUTTON_FIG,COMPONENTS]=nyedack_s_main(varargin)
 
 fig_name='Push button v.001a'
 
+nparams=length(varargin);
+
+if mod(nparams,2)>0
+	error('Parameters must be specified as parameter/value pairs!');
+end
+
 for i=1:2:nparams
   switch lower(varargin{i})
 		case 'fig_name'
