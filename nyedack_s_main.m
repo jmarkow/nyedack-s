@@ -199,8 +199,10 @@ switch lower(loop)
       error('Could not initialize kinect.');
     end
 
-    kinect_objects=kinect_v1_logging(kinect_objects,varargin{:});
+		% filename should at least be in same directory
 
+    kinect_objects=kinect_v1_logging(kinect_objects,varargin{:},...
+			'filename',fullfile('base_dir',['video_data_' datestr(now,file_format)]));
 		nyedack_s_loop_nidaq_kinect(session,objects,listeners,logfile,...
 			kinect_objects,varargin{:})
 
