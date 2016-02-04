@@ -136,7 +136,12 @@ while i<nframes
 	end
 
 	% Trigger both color and depth sources.
-  trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+	try
+  	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+	catch
+		disp('Dropped a frame');
+		continue;
+	end
 
   % Get the acquired frames and metadata.
   [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
