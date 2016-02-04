@@ -181,34 +181,6 @@ listeners{1}=addlistener(session,'DataAvailable',...
 % rudimentary set of buttons to pause, resume or quit
 % perhaps add a button for manual triggering of the output for testing
 
-% TODO: break this out to another function
-
-[button_figure,components]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
-
-% add figure for output as well
-
-set(components.stop_button,'call',...
-	{@nyedack_s_stop_routine,logfile,objects,components.status_text,components.start_button,components.stop_button});
-set(components.start_button,'call',...
-	{@nyedack_s_start_routine,logfile,objects,components.status_text,components.start_button,components.stop_button});
-
-% refresh rate of scope determined by TimerPeriod
-
-set(components.quit_button,'call',...
-	{@nyedack_s_early_quit,button_figure});
-
-warning('off','daq:general:nosave');
-
-set(button_figure,'Visible','on');
-cleanup_object=onCleanup(@()nyedack_s_cleanup_routine([],[],save_dir,logfile,objects,listeners,button_figure));
-
-% options for separate loops (just NiDaq, NiDaq+Kinect, etc. )
-
-startBackground(session);
-set(components.status_text,'string','Status:  running','ForegroundColor','g');
-
-% pause for a millisecond, consider storing status in userdata
-
 % separate loops for nyedack or nyedack+kinect
 
 strcmp lower(loop)
@@ -226,26 +198,6 @@ strcmp lower(loop)
 
 end
 
-while 1>0
 
-	if ~ishandle(button_figure), break; end
-
-	flag=1;
-	for i=1:length(objects)
-		if ~objects{i}.IsRunning
-			flag=0;
-			break;
-		end
-	end
-
-	if flag
-		set(components.status_text,'string','Status:  running','ForegroundColor','g');
-	else
-		set(components.status_text,'string','Status:  stopped','ForegroundColor','r');
-	end
-
-	pause(.1);
-
-end
 
 % if everything worked, copy the finish time and wrap up
