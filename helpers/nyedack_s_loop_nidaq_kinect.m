@@ -140,6 +140,7 @@ while i<nframes
   	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 	catch
 		disp('Dropped a frame');
+		i=i+nframes_per_trig;
 		continue;
 	end
 
