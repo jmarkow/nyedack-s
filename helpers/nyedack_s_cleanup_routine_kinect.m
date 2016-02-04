@@ -1,4 +1,4 @@
-function cleanup_routine(obj,event,save_directory,logfile,objects,listeners,button_figure,kinect_objects,kinect_files,kinect_figs)
+function cleanup_routine(obj,event,logfile,objects,listeners,button_figure,kinect_objects,kinect_files,kinect_figs)
 
 disp('Cleaning up and quitting...');
 
