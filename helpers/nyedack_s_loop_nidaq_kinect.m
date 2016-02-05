@@ -162,7 +162,7 @@ while i<nframes
     % time elapsed since reference tic, use to align to other data
     fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc);
   else
-    fprintf(csv_file,'%g, %g\n');
+    fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
   end
 
 end
