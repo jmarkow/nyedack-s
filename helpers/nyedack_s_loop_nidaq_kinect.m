@@ -76,7 +76,9 @@ if preview_mode>0
   vres=res(2);
   preview_fig=figure();
   image_h=imagesc(zeros(vres/downsample_fact,hres/downsample_fact));
-  colormap(gray);
+	if preview_mode==2
+  	colormap(gray);
+	end
   %colorbar();
   title_h=title('Frame data...');
 else
@@ -149,7 +151,7 @@ while i<nframes
     end
   elseif preview_mode==1
     if mod(i,frame_skip) == 0
-      set(image_h,'CData',img_color(1:downsample_fact:end,1:downsample_fact:end));
+      set(image_h,'CData',img_color(1:downsample_fact:end,1:downsample_fact:end,:));
     end
   end
 
