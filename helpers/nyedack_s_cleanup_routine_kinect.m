@@ -11,8 +11,6 @@ for i=1:length(objects)
 	fprintf('Object %i (%s) isrunning %i\n',i,objects{i}.Vendor.ID,objects{i}.IsRunning);
 end
 
-disp('Run complete!');
-
 figs=fieldnames(button_figure);
 for i=1:length(figs)
 	if isfield(button_figure,figs{i}) & ishandle(button_figure.(figs{i}))
@@ -24,12 +22,8 @@ for i=1:length(listeners)
 	delete(listeners{i});
 end
 
-for i=1:length(kinect_figs)
-	if ishandle(kinect_figs(i))
-		delete(kinect_figs(i));
-	end
-end
+% cleanup kinect
 
-for i=1:length(kinect_files)
-	fclose(kinect_files(i));
-end
+fprintf('Shutting down Kinect...\n');
+
+kinect_v1_cleanup_routine([],[],kinect_objects,kinect_files,kinect_figs);
