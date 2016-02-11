@@ -103,6 +103,7 @@ set(button_figure.kinect,'visible','on');
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 pause(3); %allow time for both streams to start
 
+startBackground(SESSION);
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
 pause(.2);
@@ -123,7 +124,6 @@ else
 	fprintf(csv_file,'%s, %s\n','Color','Depth');
 end
 
-startBackground(SESSION);
 
 i=1;
 while i<nframes
