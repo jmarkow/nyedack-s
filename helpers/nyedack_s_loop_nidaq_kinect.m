@@ -100,7 +100,7 @@ csv_file=fopen(fullfile(pathname,[filename '.csv']),'w+');
 set(button_figure.nidaq,'visible','on');
 set(button_figure.kinect,'visible','on');
 
-startBackground(SESSION);start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
+start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 pause(3); %allow time for both streams to start
 
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
@@ -122,6 +122,8 @@ if ~isempty(reference_tic)
 else
 	fprintf(csv_file,'%s, %s\n','Color','Depth');
 end
+
+startBackground(SESSION);
 
 i=1;
 while i<nframes
