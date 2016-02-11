@@ -101,12 +101,12 @@ set(button_figure.nidaq,'visible','on');
 set(button_figure.kinect,'visible','on');
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-pause(3); %allow time for both streams to start
+pause(4); %allow time for both streams to start
 
 startBackground(SESSION);
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
-pause(.2);
+%pause(.2);
 
 set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','g');
 set(components.kinect.status_text,'string','Status:  running','ForegroundColor','g');
