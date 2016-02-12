@@ -9,6 +9,7 @@ reference_tic=[];
 downsample_fact=2;
 frame_skip=1;
 status_check=1;
+wait_time=6;
 
 nparams=length(varargin);
 
@@ -20,14 +21,14 @@ for i=1:2:nparams
   switch lower(varargin{i})
     case 'preview_mode'
       preview_mode=varargin{i+1};
-    case 'reference_tic'
-      reference_tic=varargin{i+1};
     case 'downsample_fact'
       downsample_fact=2;
     case 'frame_skip'
       frame_skip=1;
 		case 'status_check'
-			status_check=0;
+			status_check=varargin{i+1};
+		case 'wait_time'
+			wait_time=varargin{i+1};
     otherwise
 	end
 end
@@ -116,9 +117,12 @@ else
 end
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-pause(4); %allow time for both streams to start
+fprintf('Pausing for %i seconds before acquisition begins...',wait_time);
+pause(wait_time); %allow time for both streams to start
 
 startBackground(SESSION);
+reference_tic=tic;
+
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
 %pause(.2);
@@ -182,7 +186,7 @@ while i<nframes
 
 	if ~isempty(reference_tic)
 		% time elapsed since reference tic, use to align to other data
-		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc);
+		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
 	else
 		fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
 	end
