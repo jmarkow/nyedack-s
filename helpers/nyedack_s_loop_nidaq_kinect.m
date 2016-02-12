@@ -112,7 +112,7 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-fprintf('Pausing for %i seconds before acquisition begins...',wait_time);
+fprintf('Pausing for %i seconds before acquisition begins...\n',wait_time);
 pause(wait_time); %allow time for both streams to start
 
 startBackground(SESSION);
@@ -126,9 +126,8 @@ else
 end
 
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-fprintf('Waiting for video objects to start...\n');
-
-%pause(.2);% aggregate oncleanup
+fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
+pause(wait_time);% aggregate oncleanup
 
 i=1;
 while i<nframes
