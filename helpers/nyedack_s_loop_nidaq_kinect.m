@@ -29,6 +29,7 @@ for i=1:2:nparams
 	end
 end
 
+% TODO: status updates for kinect and nidaq
 % nidaq initialization
 
 [button_figure.nidaq,components.nidaq]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
@@ -50,8 +51,6 @@ set(components.nidaq.quit_button,'call',...
 warning('off','daq:general:nosave');
 
 % kinect initialization
-
-
 
 nframes=KINECT_OBJECTS.color_vid.TriggerRepeat;
 nframes_per_trig=KINECT_OBJECTS.color_vid.FramesPerTrigger;
@@ -93,7 +92,7 @@ set(components.kinect.start_button,'call',...
 set(components.kinect.quit_button,'call',...
 	{@nyedack_s_early_quit,button_figure.kinect});
 
-parameters=KINECT_OBJECTS.depth_vid.UserData
+parameters=KINECT_OBJECTS.depth_vid.UserData;
 [pathname,filename,ext]=fileparts(parameters.depth_filename);
 csv_file=fopen(fullfile(pathname,[filename '.csv']),'w+');
 

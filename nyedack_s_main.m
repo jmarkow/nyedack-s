@@ -116,17 +116,14 @@ for i=1:2:nparams
 			file_format=varargin{i+1};
 		case 'pxi_fix'
 			pxi_fix=varargin{i+1};
-        case 'loop'
-            loop=varargin{i+1};
+    case 'loop'
+      loop=varargin{i+1};
 		otherwise
 	end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TODO: finish save_directory creation
 % TODO: put preview back in
-% TODO: change function names as appropriate
-% TODO: simplify as much as possible!
 
 % compute the save frequency in seconds
 
@@ -151,7 +148,7 @@ session=nyedack_s_init_input(INCHANNELS,...
 	'in_device',in_device,...
 	'fs',fs,...
 	'channel_labels',channel_labels,...
-	'save_freq',save_freq)
+	'save_freq',save_freq);
 
 % set the parameters of the analog input object
 
@@ -163,6 +160,7 @@ end
 
 logfile_name=sprintf('%s_%s',fullfile(save_dir,'log'),datestr(now,30));
 logfile=fopen([ logfile_name '.txt' ],'w');
+
 fprintf(logfile,'Run started at %s\n\n',datestr(now));
 fprintf(logfile,[note '\n']);
 fprintf(logfile,'User specified save frequency: %g minutes\n',save_freq/60);
@@ -176,7 +174,7 @@ fprintf(logfile,']\n\n');
 
 objects{1}=session;
 listeners{1}=addlistener(session,'DataAvailable',...
-	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile));
+	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,file_basename,file_format,logfile));
 
 % TODO: add outputs here
 
