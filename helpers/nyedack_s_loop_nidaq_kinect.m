@@ -128,6 +128,7 @@ end
 %trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 %fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
 %pause(wait_time);% aggregate oncleanup
+fprintf('Entering main acquisition loop...\n');
 
 i=1;
 while i<nframes
