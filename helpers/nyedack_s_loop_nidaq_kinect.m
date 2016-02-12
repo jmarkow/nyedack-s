@@ -8,6 +8,7 @@ preview_mode=1;
 reference_tic=[];
 downsample_fact=2;
 frame_skip=1;
+status_check=1;
 
 nparams=length(varargin);
 
@@ -25,6 +26,8 @@ for i=1:2:nparams
       downsample_fact=2;
     case 'frame_skip'
       frame_skip=1;
+		case 'status_check'
+			status_check=0;
     otherwise
 	end
 end
@@ -129,48 +132,59 @@ while i<nframes
 		 break;
 	end
 
-	nidaq_flag=1;
-	for i=1:length(NIDAQ_OBJECTS)
-		if ~NIDAQ_OBJECTS{i}.IsRunning
-			nidaq_flag=0;
-			break;
+	if mod(i,10)==0 & status_check
+		nidaq_flag=1;
+		for i=1:length(NIDAQ_OBJECTS)
+			if ~NIDAQ_OBJECTS{i}.IsRunning
+				nidaq_flag=0;
+				break;
+			end
 		end
-	end
 
-	if nidaq_flag
-		set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','g');
-	else
-		set(components.nidaq.status_text,'string','Status:  stopped','ForegroundColor','r');
+		if nidaq_flag
+			set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','g');
+		else
+			set(components.nidaq.status_text,'string','Status:  stopped','ForegroundColor','r');
+		end
+
+		color_status=strcmp(KINECT_OBJECTS.color_vid.Running,'on');
+		depth_status=strcmp(KINECT_OBJECTS.depth_vid.Running,'on');
+
+		if color_status & depth_status
+			set(components.kinect.status_text,'string','Status:  running','ForegroundColor','g');
+		else
+			set(components.kinect.status_text,'string','Status:  stopped','ForegroundColor','r');
+		end
 	end
 
 	% Trigger both color and depth sources.
 
 	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
-  % Get the acquired frames and metadata.
-  [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
-  [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
+	% Get the acquired frames and metadata.
+	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
+	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
-  if preview_mode==2
-    if mod(i,frame_skip) == 0
-      set(image_h,'CData',img_depth(1:downsample_fact:end,1:downsample_fact:end));
-    end
-  elseif preview_mode==1
-    if mod(i,frame_skip) == 0
-      set(image_h,'CData',img_color(1:downsample_fact:end,1:downsample_fact:end,:));
-    end
-  end
+	if preview_mode==2
+		if mod(i,frame_skip) == 0
+			set(image_h,'CData',img_depth(1:downsample_fact:end,1:downsample_fact:end));
+		end
+	elseif preview_mode==1
+		if mod(i,frame_skip) == 0
+			set(image_h,'CData',img_color(1:downsample_fact:end,1:downsample_fact:end,:));
+		end
+	end
 
-  % write out data
+	% write out data
 
-  i=i+nframes_per_trig;
-  fwrite(parameters.depth_fid, swapbytes(int16(bitshift(img_depth,3))'), 'integer*2');
+	i=i+nframes_per_trig;
+	fwrite(parameters.depth_fid, swapbytes(int16(bitshift(img_depth,3))'), 'integer*2');
 
-  if ~isempty(reference_tic)
-    % time elapsed since reference tic, use to align to other data
-    fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc);
-  else
-    fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
-  end
+	if ~isempty(reference_tic)
+		% time elapsed since reference tic, use to align to other data
+		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc);
+	else
+		fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
+	end
 
 end
