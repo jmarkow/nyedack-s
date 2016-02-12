@@ -99,6 +99,19 @@ csv_file=fopen(fullfile(pathname,[filename '.csv']),'w+');
 
 set(button_figure.nidaq,'visible','on');
 set(button_figure.kinect,'visible','on');
+set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','g');
+set(components.kinect.status_text,'string','Status:  running','ForegroundColor','g');
+
+cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
+  LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
+	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
+
+if ~isempty(reference_tic)
+	% time elapsed since reference tic, use to align to other data
+	fprintf(csv_file,'%s, %s, %s\n','Color','Depth','Reference');
+else
+	fprintf(csv_file,'%s, %s\n','Color','Depth');
+end
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 pause(4); %allow time for both streams to start
@@ -108,22 +121,7 @@ trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
 %pause(.2);
 
-set(components.nidaq.status_text,'string','Status:  running','ForegroundColor','g');
-set(components.kinect.status_text,'string','Status:  running','ForegroundColor','g');
-
-cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
-  LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
-	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
-
 % aggregate oncleanup
-
-if ~isempty(reference_tic)
-	% time elapsed since reference tic, use to align to other data
-	fprintf(csv_file,'%s, %s, %s\n','Color','Depth','Reference');
-else
-	fprintf(csv_file,'%s, %s\n','Color','Depth');
-end
-
 
 i=1;
 while i<nframes
