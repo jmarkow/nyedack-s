@@ -14,7 +14,7 @@ function nyedack_s_main(INCHANNELS,OUTPUT,varargin)
 %		fs
 %		data acquisition sampling rate (default: 40e3)
 %
-%		base_dir
+%		save_dir
 %		base directory for data storage (default: 'nyedack')
 %
 %		note
@@ -66,7 +66,7 @@ if nargin<1 | isempty(INCHANNELS), INCHANNELS=0; end
 
 nparams=length(varargin);
 
-base_dir='nyedack_data'; % base directory to save
+save_dir='nyedack_data'; % base directory to save
 fs=40e3; % sampling frequency (in Hz)
 note=''; % note to save in log file
 save_freq=60; % save frequency (in s)
@@ -90,8 +90,8 @@ for i=1:2:nparams
 	switch lower(varargin{i})
 		case 'note'
 			note=varargin{i+1};
-		case 'base_dir'
-			base_dir=varargin{i+1};
+		case 'save_dir'
+			save_dir=varargin{i+1};
 		case 'fs'
 			fs=varargin{i+1};
 		case 'save_freq'
@@ -155,13 +155,13 @@ session=nyedack_s_init_input(INCHANNELS,...
 
 % set the parameters of the analog input object
 
-save_dir=fullfile(base_dir,datestr(now,folder_format),out_dir);
+save_dir=fullfile(save_dir,datestr(now,folder_format),out_dir);
 
-if ~exist(base_dir,'dir')
-	mkdir(base_dir);
+if ~exist(save_dir,'dir')
+	mkdir(save_dir);
 end
 
-logfile_name=sprintf('%s_%s',fullfile(base_dir,'log'),datestr(now,30));
+logfile_name=sprintf('%s_%s',fullfile(save_dir,'log'),datestr(now,30));
 logfile=fopen([ logfile_name '.txt' ],'w');
 fprintf(logfile,'Run started at %s\n\n',datestr(now));
 fprintf(logfile,[note '\n']);
@@ -203,7 +203,7 @@ switch lower(loop)
 		% filename should at least be in same directory
 
     kinect_objects=kinect_v1_logging(kinect_objects,varargin{:},...
-			'filename',fullfile(base_dir,[ file_basename '_' datestr(now,file_format)]));
+			'filename',fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]));
 		nyedack_s_loop_nidaq_kinect(session,objects,listeners,logfile,...
 			kinect_objects,varargin{:})
 
