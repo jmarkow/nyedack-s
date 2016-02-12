@@ -1,4 +1,4 @@
-function dump_data(obj,event,save_dir,folder_format,out_dir,file_basename,file_format,logfile)
+function dump_data(obj,event,save_dir,file_basename,file_format,logfile)
 
 % basically, a circular buffer is used!
 
@@ -27,10 +27,6 @@ for i=1:nchannels
 	data.labels{i}=obj.Channels(i).ID;
 	data.names{i}=obj.Channels(i).Name;
 	data.parameters.sensor_range{i}=obj.Channels(i).Range;
-end
-
-if ~isempty(folder_format)	
-	save_dir=fullfile(save_dir,datestr(now,folder_format),out_dir);
 end
 
 if ~exist(save_dir,'dir')
