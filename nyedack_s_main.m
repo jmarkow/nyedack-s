@@ -207,6 +207,8 @@ switch lower(loop)
 
 	otherwise
 
+	%TODO: kinect2, arduino
+
 		error('Did not understand loop type');
 
 end

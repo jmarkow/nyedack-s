@@ -36,6 +36,8 @@ end
 % TODO: status updates for kinect and nidaq
 % nidaq initialization
 
+fprintf('Setting up NiDAQ interface...');
+
 [button_figure.nidaq,components.nidaq]=nyedack_s_button_fig('fig_name','NyeDack Acquition');
 
 % add figure for output as well
@@ -53,6 +55,8 @@ set(components.nidaq.quit_button,'call',...
 	{@nyedack_s_early_quit,button_figure.nidaq});
 
 warning('off','daq:general:nosave');
+
+fprintf('done\n');
 
 % kinect initialization
 
@@ -85,6 +89,8 @@ end
 
 % make an acquisition figure
 
+fprintf('Setting up Kinect interface...');
+
 [button_figure.kinect,components.kinect]=nyedack_s_button_fig('fig_name','Kinect Acquisition');
 
 set(components.kinect.stop_button,'call',...
@@ -109,14 +115,20 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
   LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
 	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
 
-
+fprintf('done\n');
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Pausing for %i seconds before acquisition begins...\n',wait_time);
 pause(wait_time); %allow time for both streams to start
 
-startBackground(SESSION);
-reference_tic=tic;
+% timing is relative to the first trigger, align to session start as best as possible
+
+startBackground(SESSION);trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+
+% Get the acquired frames and metadata.
+
+[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
+[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
 if ~isempty(reference_tic)
 	% time elapsed since reference tic, use to align to other data
@@ -167,6 +179,7 @@ while i<nframes
 	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
 	% Get the acquired frames and metadata.
+
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 

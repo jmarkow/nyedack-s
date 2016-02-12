@@ -57,7 +57,10 @@ for i=1:length(SESSION.Channels)
 
 	param_names=fieldnames(SESSION.Channels(i));
 
-	SESSION.Channels(i).Name=channel_labels{i};
+	if ~isempty(channel_labels)
+		SESSION.Channels(i).Name=channel_labels{i};
+	end
+	
 	SESSION.Channels(i).Coupling='DC';
 
 	if any(strcmp(param_names,'TerminalConfig'))
