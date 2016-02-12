@@ -109,12 +109,7 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
   LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
 	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
 
-if ~isempty(reference_tic)
-	% time elapsed since reference tic, use to align to other data
-	fprintf(csv_file,'%s, %s, %s\n','Color','Depth','Reference');
-else
-	fprintf(csv_file,'%s, %s\n','Color','Depth');
-end
+
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Pausing for %i seconds before acquisition begins...',wait_time);
@@ -123,11 +118,17 @@ pause(wait_time); %allow time for both streams to start
 startBackground(SESSION);
 reference_tic=tic;
 
+if ~isempty(reference_tic)
+	% time elapsed since reference tic, use to align to other data
+	fprintf(csv_file,'%s, %s, %s\n','Color','Depth','Reference');
+else
+	fprintf(csv_file,'%s, %s\n','Color','Depth');
+end
+
 trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Waiting for video objects to start...\n');
-%pause(.2);
 
-% aggregate oncleanup
+%pause(.2);% aggregate oncleanup
 
 i=1;
 while i<nframes
@@ -169,6 +170,13 @@ while i<nframes
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
+	if ~isempty(reference_tic)
+		% time elapsed since reference tic, use to align to other data
+		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
+	else
+		fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
+	end
+
 	if preview_mode==2
 		if mod(i,frame_skip) == 0
 			set(image_h,'CData',img_depth(1:downsample_fact:end,1:downsample_fact:end));
@@ -183,12 +191,5 @@ while i<nframes
 
 	i=i+nframes_per_trig;
 	fwrite(parameters.depth_fid, swapbytes(int16(bitshift(img_depth,3))'), 'integer*2');
-
-	if ~isempty(reference_tic)
-		% time elapsed since reference tic, use to align to other data
-		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
-	else
-		fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
-	end
 
 end
