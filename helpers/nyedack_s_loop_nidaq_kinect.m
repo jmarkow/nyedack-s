@@ -8,7 +8,7 @@ preview_mode=1;
 reference_tic=[];
 downsample_fact=2;
 frame_skip=1;
-status_check=1;
+status_check=0;
 wait_time=6;
 
 nparams=length(varargin);
@@ -136,7 +136,7 @@ while i<nframes
 		 break;
 	end
 
-	if mod(i,10)==0 & status_check
+	if mod(i,10)==0 && status_check
 		nidaq_flag=1;
 		for i=1:length(NIDAQ_OBJECTS)
 			if ~NIDAQ_OBJECTS{i}.IsRunning
