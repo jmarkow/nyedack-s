@@ -9,7 +9,7 @@ reference_tic=[];
 downsample_fact=2;
 frame_skip=1;
 status_check=0;
-wait_time=6;
+wait_time=5;
 
 nparams=length(varargin);
 
@@ -125,9 +125,9 @@ else
 	fprintf(csv_file,'%s, %s\n','Color','Depth');
 end
 
-trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
-pause(wait_time);% aggregate oncleanup
+%trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
+%fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
+%pause(wait_time);% aggregate oncleanup
 
 i=1;
 while i<nframes
