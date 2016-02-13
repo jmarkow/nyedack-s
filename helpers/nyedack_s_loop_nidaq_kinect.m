@@ -125,6 +125,12 @@ pause(wait_time); %allow time for both streams to start
 
 startBackground(SESSION);trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
+% get difference in start times,  getdata returns abstime
+% vid object.InitialTriggerTime
+% stored in event.TriggerTime in session interface, USE IT
+% etime(abstime,vid_object.InitialTriggerTime)=time
+% so correct initial times, should remove bias
+
 % Get the acquired frames and metadata.
 
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
