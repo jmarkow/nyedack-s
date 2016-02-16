@@ -153,6 +153,8 @@ trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 initial_trigger_time.color=KINECT_OBJECTS.color_vid.InitialTriggerTime;
 initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
 
+save(fullfile(pathname,[filename '_parameters.mat']),'initial_trigger_time');
+
 fprintf(csv_file,'%s, %s\n','Color','Depth');
 fprintf('Entering main acquisition loop...\n');
 
