@@ -108,12 +108,6 @@ set(components.kinect.start_button,'call',...
 set(components.kinect.quit_button,'call',...
 	{@nyedack_s_early_quit,button_figure.kinect});
 
-if ~isempty(filename)
-	filename=[ filename '_' datestr(now,file_format) ];
-	set(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename',filename)
-	set(KINECT_OBJECTS.color_vid.DiskLogger,'Filename',filename)
-end
-
 pathname=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Path');
 filename=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename');
 [~,filename,~]=fileparts(filename);
