@@ -15,9 +15,10 @@ nchannels=length(obj.Channels);
 
 data.voltage=event.Data;
 data.time=event.TimeStamps;
-event.TriggerTime
+data.parameters.initial_trigger_time=event.TriggerTime;
 
-datafile_name=[ file_basename '_' datestr(now,file_format) '.mat' ];
+datafile_name=[ file_basename '_' ...
+       datestr(addtodate(now,-event.TimeStamps(end),'second'),file_format) '.mat' ];
 
 data.fs=actualrate;
 data.labels={};

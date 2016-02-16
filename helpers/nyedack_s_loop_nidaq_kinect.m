@@ -102,8 +102,9 @@ set(components.kinect.start_button,'call',...
 set(components.kinect.quit_button,'call',...
 	{@nyedack_s_early_quit,button_figure.kinect});
 
-parameters=KINECT_OBJECTS.depth_vid.UserData;
-[pathname,filename,ext]=fileparts(parameters.depth_filename);
+pathname=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Path');
+filename=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename');
+[~,filename,~]=fileparts(filename);
 csv_file=fopen(fullfile(pathname,[filename '.csv']),'w+');
 
 set(button_figure.nidaq,'visible','on');
@@ -113,7 +114,7 @@ set(components.kinect.status_text,'string','Status:  running','ForegroundColor',
 
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
   LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
-	KINECT_OBJECTS,[parameters.depth_fid csv_file],preview_fig));
+	KINECT_OBJECTS,csv_file,preview_fig));
 
 fprintf('done\n');
 
@@ -136,12 +137,8 @@ startBackground(SESSION);trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
-if ~isempty(reference_tic)
-	% time elapsed since reference tic, use to align to other data
-	fprintf(csv_file,'%s, %s, %s\n','Color','Depth','Reference');
-else
-	fprintf(csv_file,'%s, %s\n','Color','Depth');
-end
+
+fprintf(csv_file,'%s, %s\n','Color','Depth');
 
 %trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 %fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
@@ -188,13 +185,8 @@ while i<nframes
 
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
-
-	if ~isempty(reference_tic)
-		% time elapsed since reference tic, use to align to other data
-		fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
-	else
-		fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
-	end
+    
+	fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
 
 	if preview_mode==2
 		if mod(i,frame_skip) == 0
@@ -209,6 +201,6 @@ while i<nframes
 	% write out data
 
 	i=i+nframes_per_trig;
-	fwrite(parameters.depth_fid, swapbytes(int16(bitshift(img_depth,3))'), 'integer*2');
+	%fwrite(parameters.depth_fid, swapbytes(int16(bitshift(img_depth,3))'), 'integer*2');
 
 end
