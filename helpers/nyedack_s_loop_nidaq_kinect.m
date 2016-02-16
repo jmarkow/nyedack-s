@@ -10,6 +10,8 @@ downsample_fact=2;
 frame_skip=1;
 status_check=0;
 wait_time=5;
+filename='';
+file_format='yymmdd_HHMMSS'; % date string format for files
 
 nparams=length(varargin);
 
@@ -29,6 +31,10 @@ for i=1:2:nparams
 			status_check=varargin{i+1};
 		case 'wait_time'
 			wait_time=varargin{i+1};
+		case 'filename'
+			filename=varargin{i+1};
+		case 'file_format'
+			file_format=varargin{i+1};
     otherwise
 	end
 end
@@ -102,6 +108,12 @@ set(components.kinect.start_button,'call',...
 set(components.kinect.quit_button,'call',...
 	{@nyedack_s_early_quit,button_figure.kinect});
 
+if ~isempty(filename)
+	filename=[ filename '_' datestr(now,file_format) ];
+	set(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename',filename)
+	set(KINECT_OBJECTS.color_vid.DiskLogger,'Filename',filename)
+end
+
 pathname=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Path');
 filename=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename');
 [~,filename,~]=fileparts(filename);
@@ -124,7 +136,8 @@ pause(wait_time); %allow time for both streams to start
 
 % timing is relative to the first trigger, align to session start as best as possible
 
-startBackground(SESSION);trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+startBackground(SESSION);
+trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
 % get difference in start times,  getdata returns abstime
 % vid object.InitialTriggerTime
@@ -137,12 +150,10 @@ startBackground(SESSION);trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
+initial_trigger_time.color=KINECT_OBJECTS.color_vid.InitialTriggerTime;
+initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
 
 fprintf(csv_file,'%s, %s\n','Color','Depth');
-
-%trigger([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-%fprintf('Pausing for %i seconds before entering loop...\n',wait_time);
-%pause(wait_time);% aggregate oncleanup
 fprintf('Entering main acquisition loop...\n');
 
 i=1;
@@ -185,7 +196,7 @@ while i<nframes
 
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
-    
+
 	fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
 
 	if preview_mode==2
