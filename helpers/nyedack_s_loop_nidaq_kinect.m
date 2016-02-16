@@ -125,12 +125,14 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 fprintf('done\n');
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
-fprintf('Pausing for %i seconds before acquisition begins...\n',wait_time);
+fprintf('Pausing for %i seconds before acquisition begins...',wait_time);
 pause(wait_time); %allow time for both streams to start
-
+fprintf('done\n');
 % timing is relative to the first trigger, align to session start as best as possible
 
 startBackground(SESSION);
+reference_tic=tic;
+
 trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
 % get difference in start times,  getdata returns abstime
@@ -193,7 +195,7 @@ while i<nframes
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 
-	fprintf(csv_file,'%g, %g\n',ts.color,ts.depth);
+	fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
 
 	if preview_mode==2
 		if mod(i,frame_skip) == 0

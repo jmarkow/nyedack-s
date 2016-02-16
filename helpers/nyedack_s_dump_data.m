@@ -18,7 +18,7 @@ data.time=event.TimeStamps;
 data.parameters.initial_trigger_time=event.TriggerTime;
 
 datafile_name=[ file_basename '_' ...
-       datestr(addtodate(now,-event.TimeStamps(end),'second'),file_format) '.mat' ];
+       datestr(addtodate(now,-round(data.time(end)),'second'),file_format) '.mat' ];
 
 data.fs=actualrate;
 data.labels={};
