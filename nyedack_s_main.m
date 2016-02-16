@@ -78,7 +78,7 @@ folder_format='yymmdd_HHMMSS'; % date string format for folders
 file_format='yymmdd_HHMMSS'; % date string format for files
 out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
-file_basename='data'; % basename for save files
+file_basename=''; % basename for save files
 pxi_fix=0;
 loop='nidaq';
 
@@ -120,6 +120,10 @@ for i=1:2:nparams
       loop=varargin{i+1};
 		otherwise
 	end
+end
+
+if isempty(file_basename)
+	file_basename=input('Enter base filename:  ','s');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
