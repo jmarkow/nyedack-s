@@ -1,4 +1,4 @@
-function nyedack_s_dump_data_kinect(obj,event,filename,reference_tic)
+function nyedack_s_dump_data_kinect(obj,event,fid,reference_tic)
 % TODO: create another version that simply dumps to a text file by appending
 % with option to use toc timestamps (will be critical for syncing)
 % basically, a circular buffer is used!
@@ -14,8 +14,8 @@ nchannels=length(obj.Channels);
 
 % write the data, get out of dodge
 
-fwrite('%f, %f, ',event.TimeStamps,reference_ts)
+fprintf(fid,'%f, %f, ',event.TimeStamps,reference_ts);
 for i=1:nchannels-1
-  fwrite('%f,',event.Data(1,i));
+  fprintf(fid,'%f,',event.Data(1,i));
 end
-fwrite('%f\n',event.Data(1,nchannels));
+fprintf(fid,'%f\n',event.Data(1,nchannels));

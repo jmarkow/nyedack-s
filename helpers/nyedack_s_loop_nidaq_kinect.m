@@ -209,7 +209,7 @@ while i<nframes
 
 	% if we use toc timestamps for NiDAQ we should be in "decent" shape, need to test...
 
-	fprintf(csv_file,'%f, %f, %f, %f\n',ts.color,ts.color_toc,ts.depth,ts.depth_toc;
+	fprintf(csv_file,'%f, %f, %f, %f\n',ts.color,ts.color_toc,ts.depth,ts.depth_toc);
 
 	if preview_mode==2
 		if mod(i,frame_skip) == 0

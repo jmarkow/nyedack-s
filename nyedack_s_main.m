@@ -146,7 +146,7 @@ start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
 
-if strcmp(lower(loop,'nidaq+kinect'))
+if strcmp(lower(loop),'nidaq+kinect')
 	save_freq=1/fs;
 end
 
@@ -185,7 +185,7 @@ if strcmp(lower(loop),'nidaq+kinect')
 	% probably want to write out configuration...
 
 	kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
-	nidaq_fid=fopen(fullfile(save_dir,''));
+	nidaq_fid=fopen([kinect_filename '_nidaq.txt'],'w+');
 	reference_tic=tic;
 	listeners{1}=addlistener(session,'DataAvailable',...
 			@(obj,event) nyedack_s_dump_data_kinect(obj,event,nidaq_fid,reference_tic));
