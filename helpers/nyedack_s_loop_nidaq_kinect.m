@@ -140,6 +140,8 @@ if isempty(reference_tic)
 end
 
 trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+ts.color_toc=toc(reference_tic);
+ts.depth_toc=ts.color_toc;
 
 % get difference in start times,  getdata returns abstime
 % vid object.InitialTriggerTime
@@ -150,10 +152,7 @@ trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 % Get the acquired frames and metadata.
 
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
-ts.color_toc=toc(reference_tic);
-
 [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
-ts.depth_toc=toc(reference_tic);
 
 % if we use toc timestamps for NiDAQ we should be in "decent" shape, need to test...
 
@@ -166,7 +165,6 @@ initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
 % timestamps with toc since we don't need high sampling rates
 
 save(fullfile(pathname,[filename '_parameters.mat']),'initial_trigger_time');
-
 
 fprintf('Entering main acquisition loop...\n');
 
@@ -205,14 +203,13 @@ while i<nframes
 	% Trigger both color and depth sources.
 
 	trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
+	ts.color_toc=toc(reference_tic);
+	ts.depth_toc=ts.color_toc;
 
 	% Get the acquired frames and metadata.
 
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
-	ts.color_toc=toc(reference_tic);
-
 	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
-	ts.depth_toc=toc(reference_tic);
 
 	% if we use toc timestamps for NiDAQ we should be in "decent" shape, need to test...
 
