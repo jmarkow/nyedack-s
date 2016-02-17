@@ -126,6 +126,7 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
 	KINECT_OBJECTS,[csv_file NIDAQ_FID],preview_fig));
 
 fprintf('done\n');
+fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)');
 
 start([KINECT_OBJECTS.depth_vid KINECT_OBJECTS.color_vid]);
 fprintf('Pausing for %i seconds before acquisition begins...',wait_time);
@@ -150,7 +151,13 @@ trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 % Get the acquired frames and metadata.
 
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
+ts.color_toc=toc(reference_tic);
 [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
+ts.depth_toc=toc(reference_tic);
+
+% if we use toc timestamps for NiDAQ we should be in "decent" shape, need to test...
+
+fprintf(csv_file,'%f, %f, %f, %f\n',ts.color,ts.color_toc,ts.depth,ts.depth_toc);
 
 initial_trigger_time.color=KINECT_OBJECTS.color_vid.InitialTriggerTime;
 initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
@@ -160,7 +167,7 @@ initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
 
 save(fullfile(pathname,[filename '_parameters.mat']),'initial_trigger_time');
 
-fprintf(csv_file,'%s, %s\n','Color','Depth');
+
 fprintf('Entering main acquisition loop...\n');
 
 i=1;
