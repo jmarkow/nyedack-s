@@ -183,6 +183,7 @@ end
 
 fprintf(logfile,']\n\n');
 kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
+nidaq_fid=[];
 
 if strcmp(lower(loop),'nidaq+kinect') & simple_logging
 
