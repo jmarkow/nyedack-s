@@ -79,6 +79,7 @@ file_format='yymmdd_HHMMSS'; % date string format for files
 out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
 file_basename=''; % basename for save files
+simple_logging=true;
 pxi_fix=0;
 loop='nidaq';
 
@@ -118,6 +119,8 @@ for i=1:2:nparams
 			pxi_fix=varargin{i+1};
     case 'loop'
       loop=varargin{i+1};
+		case 'simple_logging'
+			simple_logging=varargin{i+1};
 		otherwise
 	end
 end
@@ -179,21 +182,20 @@ for i=1:length(INCHANNELS)
 end
 
 fprintf(logfile,']\n\n');
+kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
 
-if strcmp(lower(loop),'nidaq+kinect')
+if strcmp(lower(loop),'nidaq+kinect') & simple_logging
 
 	% probably want to write out configuration...
 
-	kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
 	nidaq_fid=fopen([kinect_filename '_nidaq.txt'],'w+');
 	reference_tic=tic;
 	listeners{1}=addlistener(session,'DataAvailable',...
 			@(obj,event) nyedack_s_dump_data_kinect(obj,event,nidaq_fid,reference_tic));
 
-elseif strcmp(lower(loop),'kinect')
+else
 
-
-
+	reference_tic=[];
 	listeners{1}=addlistener(session,'DataAvailable',...
 		@(obj,event) nyedack_s_dump_data(obj,event,save_dir,file_basename,file_format,logfile));
 

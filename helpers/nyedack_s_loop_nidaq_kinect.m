@@ -135,7 +135,6 @@ fprintf('done\n');
 % timing is relative to the first trigger, align to session start as best as possible
 
 startBackground(SESSION);
-
 if isempty(reference_tic)
 	reference_tic=tic;
 end
@@ -152,6 +151,7 @@ trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
 [img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
 ts.color_toc=toc(reference_tic);
+
 [img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
 ts.depth_toc=toc(reference_tic);
 
