@@ -114,7 +114,7 @@ set(components.kinect.quit_button,'call',...
 pathname=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Path');
 filename=get(KINECT_OBJECTS.depth_vid.DiskLogger,'Filename');
 [~,filename,~]=fileparts(filename);
-csv_file=fopen(fullfile(pathname,[filename '.csv']),'w+');
+csv_file=fopen(fullfile(pathname,[filename '_ts.csv']),'w+');
 
 set(button_figure.nidaq,'visible','on');
 set(button_figure.kinect,'visible','on');

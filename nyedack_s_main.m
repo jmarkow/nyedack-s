@@ -150,7 +150,8 @@ start_time=([datestr(now,'HHMMSS')]);
 % open the analog input object
 
 if strcmp(lower(loop),'nidaq+kinect') & simple_logging
-	save_freq=1/fs;
+	% include check for PCI device that can sample this first
+	%save_freq=1/fs;
 end
 
 session=nyedack_s_init_input(INCHANNELS,...
@@ -184,19 +185,32 @@ end
 fprintf(logfile,']\n\n');
 kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
 nidaq_fid=[];
+reference_tic=[];
 
 if strcmp(lower(loop),'nidaq+kinect') & simple_logging
 
 	% probably want to write out configuration...
 
-	nidaq_fid=fopen([kinect_filename '_nidaq.txt'],'w+');
-	reference_tic=tic;
+	nidaq_fid=fopen([kinect_filename '_nidaq.bin'],'wb+');
+	nidaq_log=fopen([kinect_filename '_nidaq.txt'],'w');
+
+	nchannels=length(session.Channels);
+
+	fprintf(nidaq_log,'Dtype: double\n');
+	fprintf(nidaq_log,'%i columns\n',nchannels+1);
+	fprintf(nidaq_log,'File format: timestamps, ');
+
+	for i=1:nchannels-1
+		fprintf(nidaq_log,' CH %s,',session.Channels(i).Name);
+	end
+	fprintf(nidaq_log,' %s\n',session.Channels(end).Name);
+	fclose(nidaq_log);
+
 	listeners{1}=addlistener(session,'DataAvailable',...
-			@(obj,event) nyedack_s_dump_data_kinect(obj,event,nidaq_fid,reference_tic));
+			@(obj,event) nyedack_s_dump_data_simple(obj,event,nidaq_fid));
 
 else
 
-	reference_tic=[];
 	listeners{1}=addlistener(session,'DataAvailable',...
 		@(obj,event) nyedack_s_dump_data(obj,event,save_dir,file_basename,file_format,logfile));
 
