@@ -1,5 +1,6 @@
 function dump_data(obj,event,save_dir,file_basename,file_format,logfile)
-
+% TODO: create another version that simply dumps to a text file by appending
+% with option to use toc timestamps (will be critical for syncing)
 % basically, a circular buffer is used!
 
 %disp('Dumping data...');

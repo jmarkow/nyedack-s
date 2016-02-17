@@ -146,6 +146,10 @@ start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
 
+if strcmp(lower(loop,'nidaq+kinect'))
+	save_freq=1/fs;
+end
+
 session=nyedack_s_init_input(INCHANNELS,...
 	'pxi_fix',pxi_fix,...
 	'in_device_type',in_device_type,...
@@ -176,9 +180,26 @@ end
 
 fprintf(logfile,']\n\n');
 
+if strcmp(lower(loop),'nidaq+kinect')
+
+	% probably want to write out configuration...
+
+	kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]);
+	nidaq_fid=fopen(fullfile(save_dir,''));
+	reference_tic=tic;
+	listeners{1}=addlistener(session,'DataAvailable',...
+			@(obj,event) nyedack_s_dump_data_kinect(obj,event,nidaq_fid,reference_tic));
+
+elseif strcmp(lower(loop),'kinect')
+
+
+
+	listeners{1}=addlistener(session,'DataAvailable',...
+		@(obj,event) nyedack_s_dump_data(obj,event,save_dir,file_basename,file_format,logfile));
+
+end
+
 objects{1}=session;
-listeners{1}=addlistener(session,'DataAvailable',...
-	@(obj,event) nyedack_s_dump_data(obj,event,save_dir,file_basename,file_format,logfile));
 
 % TODO: add outputs here
 
@@ -205,9 +226,9 @@ switch lower(loop)
 		% filename should at least be in same directory
 
     kinect_objects=kinect_v1_logging(kinect_objects,varargin{:},...
-			'filename',fullfile(save_dir,[ file_basename '_' datestr(now,file_format)]));
+			'filename',kinect_filename);
 		nyedack_s_loop_nidaq_kinect(session,objects,listeners,logfile,...
-			kinect_objects,varargin{:},'filename',file_basename);
+			kinect_objects,nidaq_fid,varargin{:},'reference_tic',reference_tic);
 
 	otherwise
 

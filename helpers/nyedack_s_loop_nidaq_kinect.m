@@ -1,4 +1,4 @@
-function nyedack_s_loop_nidaq_kinect(SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFILE,KINECT_OBJECTS,varargin)
+function nyedack_s_loop_nidaq_kinect(SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFILE,KINECT_OBJECTS,NIDAQ_FID,varargin)
 %
 %
 %
@@ -12,6 +12,7 @@ status_check=0;
 wait_time=5;
 filename='';
 file_format='yymmdd_HHMMSS'; % date string format for files
+reference_tic=tic;
 
 nparams=length(varargin);
 
@@ -35,6 +36,8 @@ for i=1:2:nparams
 			filename=varargin{i+1};
 		case 'file_format'
 			file_format=varargin{i+1};
+		case 'reference_tic'
+			reference_tic=varargin{i+1};
     otherwise
 	end
 end
@@ -120,7 +123,7 @@ set(components.kinect.status_text,'string','Status:  running','ForegroundColor',
 
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect([],[],....
   LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,button_figure,...
-	KINECT_OBJECTS,csv_file,preview_fig));
+	KINECT_OBJECTS,[csv_file NIDAQ_FID],preview_fig));
 
 fprintf('done\n');
 
@@ -131,7 +134,10 @@ fprintf('done\n');
 % timing is relative to the first trigger, align to session start as best as possible
 
 startBackground(SESSION);
-reference_tic=tic;
+
+if isempty(reference_tic)
+	reference_tic=tic;
+end
 
 trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
@@ -148,6 +154,9 @@ trigger([KINECT_OBJECTS.color_vid KINECT_OBJECTS.depth_vid]);
 
 initial_trigger_time.color=KINECT_OBJECTS.color_vid.InitialTriggerTime;
 initial_trigger_time.depth=KINECT_OBJECTS.depth_vid.InitialTriggerTime;
+
+% maybe simplest to just log using data_available, append
+% timestamps with toc since we don't need high sampling rates
 
 save(fullfile(pathname,[filename '_parameters.mat']),'initial_trigger_time');
 
@@ -193,9 +202,14 @@ while i<nframes
 	% Get the acquired frames and metadata.
 
 	[img_color, ts.color] = getdata(KINECT_OBJECTS.color_vid);
-	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
+	ts.color_toc=toc(reference_tic);
 
-	fprintf(csv_file,'%g, %g, %g\n',ts.color,ts.depth,toc(reference_tic));
+	[img_depth, ts.depth] = getdata(KINECT_OBJECTS.depth_vid);
+	ts.depth_toc=toc(reference_tic);
+
+	% if we use toc timestamps for NiDAQ we should be in "decent" shape, need to test...
+
+	fprintf(csv_file,'%f, %f, %f, %f\n',ts.color,ts.color_toc,ts.depth,ts.depth_toc;
 
 	if preview_mode==2
 		if mod(i,frame_skip) == 0
