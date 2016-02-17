@@ -149,7 +149,7 @@ start_time=([datestr(now,'HHMMSS')]);
 
 % open the analog input object
 
-if strcmp(lower(loop),'nidaq+kinect')
+if strcmp(lower(loop),'nidaq+kinect') & simple_logging
 	save_freq=1/fs;
 end
 
