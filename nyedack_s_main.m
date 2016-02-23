@@ -79,9 +79,11 @@ file_format='yymmdd_HHMMSS'; % date string format for files
 out_dir=''; % save files to this sub directory
 channel_labels={}; % labels for INCHANNELS
 file_basename=''; % basename for save files
-simple_logging=true;
+simple_logging=false;
 pxi_fix=0;
 loop='nidaq';
+dirname='C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\inc\';
+dirname2 = 'C:\Users\dattalab\Desktop\KinectCommonBridge-2.0\KCBv2Lib';
 
 if mod(nparams,2)>0
 	error('Parameters must be specified as parameter/value pairs!');
@@ -197,13 +199,13 @@ if strcmp(lower(loop),'nidaq+kinect') & simple_logging
 	nchannels=length(session.Channels);
 
 	fprintf(nidaq_log,'Dtype: double\n');
-	fprintf(nidaq_log,'%i columns\n',nchannels+1);
-	fprintf(nidaq_log,'File format: timestamps, ');
+	fprintf(nidaq_log,'%i rows\n',nchannels+1);
+	fprintf(nidaq_log,'File format:\nTimestamps\n');
 
-	for i=1:nchannels-1
-		fprintf(nidaq_log,' CH %s,',session.Channels(i).Name);
+	for i=1:nchannels
+		fprintf(nidaq_log,'CH %s\n',session.Channels(i).Name);
 	end
-	fprintf(nidaq_log,' %s\n',session.Channels(end).Name);
+
 	fclose(nidaq_log);
 
 	listeners{1}=addlistener(session,'DataAvailable',...
@@ -246,6 +248,30 @@ switch lower(loop)
 			'filename',kinect_filename);
 		nyedack_s_loop_nidaq_kinect(session,objects,listeners,logfile,...
 			kinect_objects,nidaq_fid,varargin{:},'reference_tic',reference_tic);
+
+	case 'nidaq+kinect2'
+
+		% kinect 2, load libraries, initialize, start loop
+
+		kinect_v2_load_libraries(dirname,dirname2);
+
+		% initialize depth and color streams
+
+		[kin_id,frame_ptr_color,frame_description_ptr_color,status]=kinect_v2_init_color;
+
+		if status~=0
+			error('Error initializing color string');
+		end
+
+		[kin_id,frame_ptr_depth,frame_description_ptr_depth,status]=kinect_v2_init_depth;
+
+		if status~=0
+			error('Error initializing depth stream');
+		end
+
+		nyedack_s_loop_nidaq_kinect_v2(session,objects,listeners,logfile,...
+			kin_id,frame_ptr_color,frame_description_ptr_color,...
+			frame_ptr_depth,frame_description_ptr_depth,filename,varargin{:});
 
 	otherwise
 
