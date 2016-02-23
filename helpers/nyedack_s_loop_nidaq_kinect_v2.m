@@ -14,6 +14,8 @@ frame_skip=5;
 status_check=0;
 filename='';
 rec_color=0;
+color_bands=2; % which rgb band to record
+color_downsample_fact=2;
 nframes=inf;
 
 nparams=length(varargin);
@@ -85,9 +87,10 @@ end
 metadata_file=fopen(fullfile(pathname,[filename '_parameters.txt']),'wt');
 
 if rec_color
-	fprintf(metadata_file,'Color stream:\n%i x %i pxs\nint8 ieee-%se\n',...
-		FRAME_DESCRIPTION_PTR_COLOR.Width,...
-		FRAME_DESCRIPTION_PTR_COLOR.Height,...
+	fprintf(metadata_file,'Color stream:\n%i x %i pxs (%i bands)\nint8 ieee-%se\n',...
+		FRAME_DESCRIPTION_PTR_COLOR.Width/color_downsample_fact,...
+		FRAME_DESCRIPTION_PTR_COLOR.Height/color_downsample_fact,...
+		length(color_bands),...
 		lower(endian));
 else
 	fprintf(metadata_file,'Color stream: off\n');
@@ -98,7 +101,9 @@ fprintf(metadata_file,'Depth stream:\n%i x %i pxs\nint8 ieee-%se\n',...
 	FRAME_DESCRIPTION_PTR_DEPTH.Height,...
 	lower(endian));
 
-[x,y,z]=ndgrid(2,1:FRAME_DESCRIPTION_PTR_COLOR.Width,1:FRAME_DESCRIPTION_PTR_COLOR.Height);
+[x,y,z]=ndgrid(color_bands,...
+	1:color_downsample_fact:FRAME_DESCRIPTION_PTR_COLOR.Width,...
+	1:color_downsample_fact:FRAME_DESCRIPTION_PTR_COLOR.Height);
 idx_color=sub2ind([4 FRAME_DESCRIPTION_PTR_COLOR.Width FRAME_DESCRIPTION_PTR_COLOR.Height],x(:),y(:),z(:));
 
 [x,y]=meshgrid(1:downsample_fact:FRAME_DESCRIPTION_PTR_DEPTH.Width,...
@@ -150,15 +155,15 @@ while i<nframes
 		end
     end
 
-    
+
 	status1=1;
 	status2=1;
-    
+
 	while status1~=0
 		status1=calllib('KCBv2','KCBGetColorFrame',KINECT_ID,FRAME_PTR_COLOR);
 		color_toc=toc(reference_tic);
     end
-    
+
 	while status2~=0
 		status2=calllib('KCBv2','KCBGetDepthFrame',KINECT_ID,FRAME_PTR_DEPTH);
 		depth_toc=toc(reference_tic);
