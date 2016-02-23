@@ -255,23 +255,9 @@ switch lower(loop)
 
 		kinect_v2_load_libraries(dirname,dirname2);
 
-		% initialize depth and color streams
-
-		[kin_id,frame_ptr_color,frame_description_ptr_color,status]=kinect_v2_init_color;
-
-		if status~=0
-			error('Error initializing color string');
-		end
-
-		[kin_id,frame_ptr_depth,frame_description_ptr_depth,status]=kinect_v2_init_depth;
-
-		if status~=0
-			error('Error initializing depth stream');
-		end
 
 		nyedack_s_loop_nidaq_kinect_v2(session,objects,listeners,logfile,nidaq_fid,...
-			kin_id,frame_ptr_color,frame_description_ptr_color,...
-			frame_ptr_depth,frame_description_ptr_depth,kinect_filename,varargin{:});
+			kinect_filename,varargin{:});
 
 	otherwise
 
