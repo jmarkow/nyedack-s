@@ -40,6 +40,8 @@ for i=1:2:nparams
           simple_logging=varargin{i+1};
       case 'rec_color'
           rec_color=varargin{i+1};
+      case 'color_downsample_fact'
+          color_downsample_fact=varargin{i+1};
     otherwise
 	end
 end
