@@ -1,5 +1,13 @@
 function cleanup_routine(obj,event,logfile,objects,listeners,kinect_id,kinect_files,kinect_figs)
 
+
+
+% cleanup kinect
+
+fprintf('Shutting down Kinect...\n');
+kinect_v2_cleanup_routine([],[],kinect_id,kinect_files,kinect_figs);
+pause(4); % make sure kinect if OFF before shutting down NIDAQ recording
+
 disp('Cleaning up and quitting...');
 fprintf(logfile,'\nRun complete at %s',datestr(now));
 fclose(logfile);
@@ -13,8 +21,3 @@ end
 for i=1:length(listeners)
 	delete(listeners{i});
 end
-
-% cleanup kinect
-
-fprintf('Shutting down Kinect...\n');
-kinect_v2_cleanup_routine([],[],kinect_id,kinect_files,kinect_figs);

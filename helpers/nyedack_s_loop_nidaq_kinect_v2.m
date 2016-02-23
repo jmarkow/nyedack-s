@@ -1,7 +1,7 @@
 function nyedack_s_loop_nidaq_kinect_v2(...
 	SESSION,NIDAQ_OBJECTS,NIDAQ_LISTENERS,LOGFILE,NIDAQ_FID,...
-	KINECT_ID,FRAME_PTR_COLOR,FRAME_DESCRIPTION_PTR_COLOR,...
-		FRAME_PTR_DEPTH,FRAME_DESCRIPTION_PTR_DEPTH,FILENAME,varargin)
+	kin_id,frame_ptr_color,frame_description_ptr_color,...
+		frame_ptr_depth,frame_description_ptr_depth,FILENAME,varargin)
 
 %
 %
@@ -88,10 +88,39 @@ end
 
 metadata_file=fopen(fullfile(pathname,[filename '_parameters.txt']),'wt');
 
+
+
+
+fprintf('done\n');
+fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)');
+
+% timing is relative to the first trigger, align to session start as best as possible
+
+startBackground(SESSION);
+% wait until session IsRunning
+
+pause(4);
+
+reference_tic=tic;
+
+% initialize depth and color streams
+
+[kin_id,frame_ptr_color,frame_description_ptr_color,status]=kinect_v2_init_color;
+
+if status~=0
+	error('Error initializing color string');
+end
+
+[kin_id,frame_ptr_depth,frame_description_ptr_depth,status]=kinect_v2_init_depth;
+
+if status~=0
+	error('Error initializing depth stream');
+end
+
 if rec_color
 	fprintf(metadata_file,'Color stream:\n%i x %i pxs (%i bands)\nint8 ieee-%se\n',...
-		FRAME_DESCRIPTION_PTR_COLOR.Width/color_downsample_fact,...
-		FRAME_DESCRIPTION_PTR_COLOR.Height/color_downsample_fact,...
+		frame_description_ptr_color.Width/color_downsample_fact,...
+		frame_description_ptr_color.Height/color_downsample_fact,...
 		length(color_bands),...
 		lower(endian));
 else
@@ -99,20 +128,20 @@ else
 end
 
 fprintf(metadata_file,'Depth stream:\n%i x %i pxs\nint8 ieee-%se\n',...
-	FRAME_DESCRIPTION_PTR_DEPTH.Width,...
-	FRAME_DESCRIPTION_PTR_DEPTH.Height,...
+	frame_description_ptr_depth.Width,...
+	frame_description_ptr_depth.Height,...
 	lower(endian));
 
 [x,y,z]=ndgrid(color_bands,...
-	1:color_downsample_fact:FRAME_DESCRIPTION_PTR_COLOR.Width,...
-	1:color_downsample_fact:FRAME_DESCRIPTION_PTR_COLOR.Height);
-idx_color=sub2ind([4 FRAME_DESCRIPTION_PTR_COLOR.Width FRAME_DESCRIPTION_PTR_COLOR.Height],x(:),y(:),z(:));
+	1:color_downsample_fact:frame_description_ptr_color.Width,...
+	1:color_downsample_fact:frame_description_ptr_color.Height);
+idx_color=sub2ind([4 frame_description_ptr_color.Width frame_description_ptr_color.Height],x(:),y(:),z(:));
 
-[x,y]=meshgrid(1:downsample_fact:FRAME_DESCRIPTION_PTR_DEPTH.Width,...
-	1:downsample_fact:FRAME_DESCRIPTION_PTR_DEPTH.Height);
-idx_depth=sub2ind([FRAME_DESCRIPTION_PTR_DEPTH.Width FRAME_DESCRIPTION_PTR_DEPTH.Height],x(:),y(:));
+[x,y]=meshgrid(1:downsample_fact:frame_description_ptr_depth.Width,...
+	1:downsample_fact:frame_description_ptr_depth.Height);
+idx_depth=sub2ind([frame_description_ptr_depth.Width frame_description_ptr_depth.Height],x(:),y(:));
 
-new_depth_res=[FRAME_DESCRIPTION_PTR_DEPTH.Height/downsample_fact,FRAME_DESCRIPTION_PTR_DEPTH.Width/downsample_fact];
+new_depth_res=[frame_description_ptr_depth.Height/downsample_fact,frame_description_ptr_depth.Width/downsample_fact];
 
 preview_fig=figure('resize','off','menubar','none');
 h=imagesc(zeros(new_depth_res(1),new_depth_res(2)));
@@ -121,16 +150,8 @@ set(button_figure.nidaq,'visible','on');
 
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect_v2([],[],....
   LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,...
-	KINECT_ID,[ csv_file depth_file color_file metadata_file NIDAQ_FID ],...
+	kin_id,[ csv_file depth_file color_file metadata_file NIDAQ_FID ],...
 	[ preview_fig button_figure.nidaq ]));
-
-fprintf('done\n');
-fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)');
-
-% timing is relative to the first trigger, align to session start as best as possible
-
-startBackground(SESSION);
-reference_tic=tic;
 
 fprintf('Entering main acquisition loop...\n');
 
@@ -162,28 +183,28 @@ while i<nframes
 	status2=1;
 
 	while status1~=0
-		status1=calllib('KCBv2','KCBGetColorFrame',KINECT_ID,FRAME_PTR_COLOR);
+		status1=calllib('KCBv2','KCBGetColorFrame',kin_id,frame_ptr_color);
 		color_toc=toc(reference_tic);
     end
 
 	while status2~=0
-		status2=calllib('KCBv2','KCBGetDepthFrame',KINECT_ID,FRAME_PTR_DEPTH);
+		status2=calllib('KCBv2','KCBGetDepthFrame',kin_id,frame_ptr_depth);
 		depth_toc=toc(reference_tic);
 	end
 
 	if preview_mode && mod(i,frame_skip)==0
-		depth_data=reshape(FRAME_PTR_DEPTH.Buffer(idx_depth),...
+		depth_data=reshape(frame_ptr_depth.Buffer(idx_depth),...
 		[new_depth_res(1) new_depth_res(2)]);
 		set(h,'cdata',depth_data);
 		drawnow;
 	end
 
 	fprintf(csv_file,'%f, %f, %f, %f\n',...
-	FRAME_PTR_COLOR.TimeStamp,color_toc,FRAME_PTR_DEPTH.TimeStamp,depth_toc);
-	fwrite(depth_file,FRAME_PTR_DEPTH.Buffer,'int16'); % uses native format, can enforce
+	frame_ptr_color.TimeStamp,color_toc,frame_ptr_depth.TimeStamp,depth_toc);
+	fwrite(depth_file,frame_ptr_depth.Buffer,'int16'); % uses native format, can enforce
 
 	if rec_color
-		fwrite(color_file,FRAME_PTR_COLOR.Buffer(idx_color),'int8');
+		fwrite(color_file,frame_ptr_color.Buffer(idx_color),'int8');
 	end
 
 	i=i+1;
