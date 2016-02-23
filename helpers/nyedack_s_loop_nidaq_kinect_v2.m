@@ -14,6 +14,8 @@ frame_skip=5;
 status_check=0;
 filename='';
 rec_color=0;
+nframes=inf;
+
 nparams=length(varargin);
 
 if mod(nparams,2)>0
@@ -32,6 +34,10 @@ for i=1:2:nparams
 			status_check=varargin{i+1};
 		case 'filename'
 			filename=varargin{i+1};
+      case 'simple_logging'
+          simple_logging=varargin{i+1};
+      case 'rec_color'
+          rec_color=varargin{i+1};
     otherwise
 	end
 end
@@ -66,7 +72,7 @@ fprintf('done\n');
 [pathname,filename,~]=fileparts(FILENAME);
 
 csv_file=fopen(fullfile(pathname,[filename '.csv']),'wt');
-depth_file=fopen(fullfile(pathname,[filename '_depth.bin']),'Wb')
+depth_file=fopen(fullfile(pathname,[filename '_depth.bin']),'Wb');
 
 if rec_color
 	color_file=fopen(fullfile(pathname,[filename '_color.bin']),'Wb');
@@ -80,8 +86,8 @@ metadata_file=fopen(fullfile(pathname,[filename '_parameters.txt']),'wt');
 
 if rec_color
 	fprintf(metadata_file,'Color stream:\n%i x %i pxs\nint8 ieee-%se\n',...
-		FRAME_PTR_DESCRIPTION_COLOR.Width,...
-		FRAME_PTR_DESCRIPTION_COLOR.Height,...
+		FRAME_DESCRIPTION_PTR_COLOR.Width,...
+		FRAME_DESCRIPTION_PTR_COLOR.Height,...
 		lower(endian));
 else
 	fprintf(metadata_file,'Color stream: off\n');
@@ -92,7 +98,7 @@ fprintf(metadata_file,'Depth stream:\n%i x %i pxs\nint8 ieee-%se\n',...
 	FRAME_DESCRIPTION_PTR_DEPTH.Height,...
 	lower(endian));
 
-[x,y,z]=ndgrid(1:3,1:FRAME_DESCRIPTION_PTR_COLOR.Width,1:FRAME_DESCRIPTION_PTR_COLOR.Height);
+[x,y,z]=ndgrid(2,1:FRAME_DESCRIPTION_PTR_COLOR.Width,1:FRAME_DESCRIPTION_PTR_COLOR.Height);
 idx_color=sub2ind([4 FRAME_DESCRIPTION_PTR_COLOR.Width FRAME_DESCRIPTION_PTR_COLOR.Height],x(:),y(:),z(:));
 
 [x,y]=meshgrid(1:downsample_fact:FRAME_DESCRIPTION_PTR_DEPTH.Width,...
@@ -104,10 +110,11 @@ new_depth_res=[FRAME_DESCRIPTION_PTR_DEPTH.Height/downsample_fact,FRAME_DESCRIPT
 preview_fig=figure('resize','off','menubar','none');
 h=imagesc(zeros(new_depth_res(1),new_depth_res(2)));
 axis off;
+set(button_figure.nidaq,'visible','on');
 
 cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect_v2([],[],....
-  LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS...
-	KINECT_ID,[csv_file depth_file color_file metadata_file NIDAQ_FID ],...
+  LOGFILE,NIDAQ_OBJECTS,NIDAQ_LISTENERS,...
+	KINECT_ID,[ csv_file depth_file color_file metadata_file NIDAQ_FID ],...
 	[ preview_fig button_figure.nidaq ]));
 
 fprintf('done\n');
@@ -116,9 +123,7 @@ fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)')
 % timing is relative to the first trigger, align to session start as best as possible
 
 startBackground(SESSION);
-if isempty(reference_tic)
-	reference_tic=tic;
-end
+reference_tic=tic;
 
 fprintf('Entering main acquisition loop...\n');
 
@@ -143,16 +148,17 @@ while i<nframes
 		else
 			set(components.nidaq.status_text,'string','Status:  stopped','ForegroundColor','r');
 		end
-	end
+    end
 
+    
 	status1=1;
 	status2=1;
-
+    
 	while status1~=0
 		status1=calllib('KCBv2','KCBGetColorFrame',KINECT_ID,FRAME_PTR_COLOR);
 		color_toc=toc(reference_tic);
-	end
-
+    end
+    
 	while status2~=0
 		status2=calllib('KCBv2','KCBGetDepthFrame',KINECT_ID,FRAME_PTR_DEPTH);
 		depth_toc=toc(reference_tic);
@@ -165,7 +171,7 @@ while i<nframes
 		drawnow;
 	end
 
-	fprintf(csv_file,'%g, %g, %g, %g\n',...
+	fprintf(csv_file,'%f, %f, %f, %f\n',...
 	FRAME_PTR_COLOR.TimeStamp,color_toc,FRAME_PTR_DEPTH.TimeStamp,depth_toc);
 	fwrite(depth_file,FRAME_PTR_DEPTH.Buffer,'int16'); % uses native format, can enforce
 

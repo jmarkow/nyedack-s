@@ -189,7 +189,7 @@ kinect_filename=fullfile(save_dir,[ file_basename '_' datestr(now,file_format)])
 nidaq_fid=[];
 reference_tic=[];
 
-if strcmp(lower(loop),'nidaq+kinect') & simple_logging
+if (strcmp(lower(loop),'nidaq+kinect') | strcmp(lower(loop),'nidaq+kinect2')) & simple_logging
 
 	% probably want to write out configuration...
 
@@ -269,9 +269,9 @@ switch lower(loop)
 			error('Error initializing depth stream');
 		end
 
-		nyedack_s_loop_nidaq_kinect_v2(session,objects,listeners,logfile,...
+		nyedack_s_loop_nidaq_kinect_v2(session,objects,listeners,logfile,nidaq_fid,...
 			kin_id,frame_ptr_color,frame_description_ptr_color,...
-			frame_ptr_depth,frame_description_ptr_depth,filename,varargin{:});
+			frame_ptr_depth,frame_description_ptr_depth,kinect_filename,varargin{:});
 
 	otherwise
 
