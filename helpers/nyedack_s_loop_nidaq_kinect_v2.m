@@ -163,9 +163,9 @@ while i<nframes
 
 	% after a small number of warmup frames, turn on NiDAQ
 
-  if i==5
-      startBackground(SESSION);
-  end
+  %if i==5
+
+  %end
 
 	if mod(i,10)==0 && status_check
 
@@ -192,6 +192,10 @@ while i<nframes
 		status1=calllib('KCBv2','KCBGetColorFrame',kin_id,frame_ptr_color);
 	end
 
+	if i==1
+		startBackground(SESSION);
+	end
+	
 	% set something in userdata to on?
 
   color_toc=toc(reference_tic);
