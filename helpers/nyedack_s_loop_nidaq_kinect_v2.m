@@ -162,6 +162,8 @@ fprintf('Entering main acquisition loop...\n');
 i=1;
 while i<nframes
 
+	% force nidaq values to 0 until second loop around?????
+
 	if ~ishandle(button_figure.nidaq)
 		break;
 	end
@@ -187,8 +189,10 @@ while i<nframes
 
 	while status1~=0
 		status1=calllib('KCBv2','KCBGetColorFrame',kin_id,frame_ptr_color);
+
+		% once activated trip toggle for NIDAQ recording (maybe startBackground)?
 		color_toc=toc(reference_tic);
-    end
+  end
 
 	while status2~=0
 		status2=calllib('KCBv2','KCBGetDepthFrame',kin_id,frame_ptr_depth);
@@ -214,8 +218,10 @@ while i<nframes
 
 end
 
+% stop nidaq first?
+
 fprintf('Stopping Kinect...');
 kinect_v2_close(kin_id);
-
 pause(5);
+stop(SESSION);
 fprintf('done\n');
