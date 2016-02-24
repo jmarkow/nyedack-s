@@ -96,13 +96,12 @@ fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)')
 
 % timing is relative to the first trigger, align to session start as best as possible
 
-startBackground(SESSION);
 
+reference_tic=tic;
 % wait until session IsRunning
 
 pause(4);
 
-reference_tic=tic;
 
 % initialize depth and color streams
 
@@ -158,13 +157,19 @@ cleanup_object=onCleanup(@()nyedack_s_cleanup_routine_kinect_v2([],[],....
 	[ preview_fig button_figure.nidaq ]));
 
 fprintf('Entering main acquisition loop...\n');
-
 i=1;
+
+% try toggling kinect to get rid of this startup slop...
+
 while i<nframes
 
 	if ~ishandle(button_figure.nidaq)
 		break;
-	end
+    end
+    
+    if i==5
+        startBackground(SESSION);
+    end
 
 	if mod(i,10)==0 && status_check
 		nidaq_flag=1;
@@ -180,21 +185,26 @@ while i<nframes
 		else
 			set(components.nidaq.status_text,'string','Status:  stopped','ForegroundColor','r');
 		end
-  end
-
+    end
+  
 	status1=1;
 	status2=1;
-
-	while status1~=0
+    status=0;
+    
+    while status1~=0
 		status1=calllib('KCBv2','KCBGetColorFrame',kin_id,frame_ptr_color);
-		color_toc=toc(reference_tic);
     end
-
-	while status2~=0
-		status2=calllib('KCBv2','KCBGetDepthFrame',kin_id,frame_ptr_depth);
-		depth_toc=toc(reference_tic);
-	end
-
+    
+    % set something in userdata to on?
+    
+    color_toc=toc(reference_tic);
+    
+    while status2~=0
+        status2=calllib('KCBv2','KCBGetDepthFrame',kin_id,frame_ptr_depth);
+    end
+        
+    depth_toc=toc(reference_tic);
+    
 	if preview_mode && mod(i,frame_skip)==0
 		depth_data=reshape(frame_ptr_depth.Buffer(idx_depth),...
 		[new_depth_res(1) new_depth_res(2)]);
@@ -203,8 +213,8 @@ while i<nframes
 	end
 
 	fprintf(csv_file,'%f, %f, %f, %f\n',...
-	frame_ptr_color.TimeStamp,color_toc,frame_ptr_depth.TimeStamp,depth_toc);
-	fwrite(depth_file,frame_ptr_depth.Buffer,'int16'); % uses native format, can enforce
+        frame_ptr_color.TimeStamp,color_toc,frame_ptr_depth.TimeStamp,depth_toc);
+	%fwrite(depth_file,frame_ptr_depth.Buffer,'int16'); % uses native format, can enforce
 
 	if rec_color
 		fwrite(color_file,frame_ptr_color.Buffer(idx_color),'int8');
