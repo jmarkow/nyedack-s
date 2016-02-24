@@ -43,6 +43,11 @@ for i=1:2:nparams
 	end
 end
 
+% height width
+
+color_res=[1080 1920];
+depth_res=[424 512];
+
 % TODO: status updates for kinect and nidaq
 % nidaq initialization
 
@@ -86,14 +91,13 @@ end
 metadata_file=fopen(fullfile(pathname,[filename '_parameters.txt']),'wt');
 
 
-
-
 fprintf('done\n');
 fprintf(csv_file,'%s, %s, %s, %s\n','Color','Color (tic)','Depth','Depth (tic)');
 
 % timing is relative to the first trigger, align to session start as best as possible
 
 startBackground(SESSION);
+
 % wait until session IsRunning
 
 pause(4);
@@ -102,22 +106,25 @@ reference_tic=tic;
 
 % initialize depth and color streams
 
-[kin_id,frame_ptr_color,frame_description_ptr_color,status]=kinect_v2_init_color;
+%%% manually set up kinect, need to leave IR sensor OFF until we can capture a frame...
 
-if status~=0
-	error('Error initializing color string');
-end
+kin_id=calllib('KCBv2','KCBOpenDefaultSensor');
 
-[kin_id,frame_ptr_depth,frame_description_ptr_depth,status]=kinect_v2_init_depth;
+frame_color=kinect_v2_make_struct('KCBColorFrame');
+frame_ptr_color=libstruct('KCBColorFrame',frame_color);
+frame_ptr_color.Size=color_res(1)*color_res(2)*4;
+frame_ptr_color.Format='ColorImageFormat_Rgba';
+frame_ptr_color.Buffer=zeros(frame_ptr_color.Size,1,'uint8');
 
-if status~=0
-	error('Error initializing depth stream');
-end
+frame_depth=kinect_v2_make_struct('KCBDepthFrame');
+frame_ptr_depth=libstruct('KCBDepthFrame',frame_depth);
+frame_ptr_depth.Size=depth_res(1)*depth_res(2);
+frame_ptr_depth.Buffer=zeros(frame_ptr_depth.Size,1,'uint16');
 
 if rec_color
 	fprintf(metadata_file,'Color stream:\n%i x %i pxs (%i bands)\nint8 ieee-%se\n',...
-		frame_description_ptr_color.Width/color_downsample_fact,...
-		frame_description_ptr_color.Height/color_downsample_fact,...
+		color_res(2)/color_downsample_fact,...
+		color_res(1)/color_downsample_fact,...
 		length(color_bands),...
 		lower(endian));
 else
@@ -125,20 +132,20 @@ else
 end
 
 fprintf(metadata_file,'Depth stream:\n%i x %i pxs\nint8 ieee-%se\n',...
-	frame_description_ptr_depth.Width,...
-	frame_description_ptr_depth.Height,...
+	depth_res(2),...
+	depth_res(1),...
 	lower(endian));
 
 [x,y,z]=ndgrid(color_bands,...
-	1:color_downsample_fact:frame_description_ptr_color.Width,...
-	1:color_downsample_fact:frame_description_ptr_color.Height);
-idx_color=sub2ind([4 frame_description_ptr_color.Width frame_description_ptr_color.Height],x(:),y(:),z(:));
+	1:color_downsample_fact:color_res(2),...
+	1:color_downsample_fact:color_res(1));
+idx_color=sub2ind([4 color_res(2) color_res(1)],x(:),y(:),z(:));
 
-[x,y]=meshgrid(1:downsample_fact:frame_description_ptr_depth.Width,...
-	1:downsample_fact:frame_description_ptr_depth.Height);
-idx_depth=sub2ind([frame_description_ptr_depth.Width frame_description_ptr_depth.Height],x(:),y(:));
+[x,y]=meshgrid(1:downsample_fact:depth_res(2),...
+	1:downsample_fact:depth_res(1));
+idx_depth=sub2ind([depth_res(2) depth_res(1)],x(:),y(:));
 
-new_depth_res=[frame_description_ptr_depth.Height/downsample_fact,frame_description_ptr_depth.Width/downsample_fact];
+new_depth_res=[depth_res(1)/downsample_fact,depth_res(2)/downsample_fact];
 
 preview_fig=figure('resize','off','menubar','none');
 h=imagesc(zeros(new_depth_res(1),new_depth_res(2)));
@@ -173,8 +180,7 @@ while i<nframes
 		else
 			set(components.nidaq.status_text,'string','Status:  stopped','ForegroundColor','r');
 		end
-    end
-
+  end
 
 	status1=1;
 	status2=1;
@@ -207,3 +213,9 @@ while i<nframes
 	i=i+1;
 
 end
+
+fprintf('Stopping Kinect...');
+kinect_v2_close(kin_id);
+
+pause(5);
+fprintf('done\n');
